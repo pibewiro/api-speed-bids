@@ -1,16 +1,36 @@
 const User = require('../models/user');
 const hashPassword = require('../../utils/hashPassword')
 const responseStatus = require('../../utils/responseStatus');
-const validateReg = require('../../utils/validateRegistration');
+const validateReg = require('../../utils/validations/validateRegistration');
 const jwt = require('jsonwebtoken');
+const skipFunction = require('../../utils/skipFunction');
 
 const userController = {
   async index(req, res, next) {
     let user, total;
+    let limit = req.query.limit;
+    let page = req.query.page;
+
+    const obj = skipFunction(req, limit, page);
+    console.log(obj)
+
     try {
-      user = await User.find();
-      total = await User.countDocuments();
-      return res.status(200).json({ success: true, data: user, total });
+
+      if (obj.skip !== false) {
+        user = await User.find()
+          .skip(obj.skip)
+          .limit(obj.limit);
+
+        total = await User.countDocuments();
+        return res.status(200).json({ success: true, data: user, total, page: obj.page, limit: obj.limit });
+      }
+
+      else {
+        user = await User.find();
+        total = await User.countDocuments();
+        return res.status(200).json({ success: true, data: user, total });
+      }
+
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' })
