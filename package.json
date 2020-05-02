@@ -1,0 +1,27 @@
+{
+  "name": "api-speed-bids",
+  "version": "1.0.0",
+  "description": "Speed Bid TCC",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Prince Ibewiro",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.7-alpha.3",
+    "express-upload": "^0.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.11",
+    "validator": "^13.0.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.3"
+  }
+}
