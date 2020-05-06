@@ -14,11 +14,12 @@ const authController = {
     try {
       user = await User.findOne({ email }, { email: 1, password: 1, type: 1 });
 
-      if (!user) return res.status(404).json({ error: 'Invalid login details' });
+      if (!user) return res.status(404).json({ invalid: 'Invalid login details' });
 
-      const match = bcrypt.compare(password, user.password);
+      const match = await bcrypt.compare(password, user.password);
 
-      if (!match) return res.status(400).json({ error: 'Invalid login details' });
+      if (!match) return res.status(400).json({ invalid: 'Invalid login details' });
+      console.log(match)
 
       const token = await generateToken(user._id, user.type);
 

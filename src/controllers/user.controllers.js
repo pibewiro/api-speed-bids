@@ -63,7 +63,7 @@ const userController = {
             errors.cpf = 'CPF Already Exists';
           }
 
-          return res.status(400).json({ errors })
+          return res.status(400).json(errors)
         }
       } catch (err) {
         console.log(err)
