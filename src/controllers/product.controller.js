@@ -2,7 +2,9 @@ const Product = require('../models/product');
 const auth = require('../../middlewares/verifyToken');
 const validateProduct = require('../../utils/validations/validateProduct');
 const skipFunction = require('../../utils/skipFunction');
+const makeId = require('../../utils/makeId')
 const User = require('../models/user');
+const path = require('path')
 
 const productController = {
 
@@ -18,7 +20,7 @@ const productController = {
 
       if (obj.skip !== false) {
         product = await Product.find()
-          .populate({ path: 'user', select: 'firstname lastname' })
+          .populate({ path: 'user', select: 'firstname lastname username' })
           .skip(obj.skip)
           .limit(obj.limit)
           .sort({ createdAt: -1 });
@@ -29,7 +31,7 @@ const productController = {
 
       else {
         product = await Product.find()
-          .populate({ path: 'user', select: 'firstname lastname' })
+          .populate({ path: 'user', select: 'firstname lastname username' })
           .sort({ createdAt: -1 });
 
         total = await Product.countDocuments();
@@ -62,12 +64,78 @@ const productController = {
     if (!isValid) return res.status(400).json(errors);
 
     let product;
+    let newProduct;
+    let image;
     const userId = req.body.user;
 
     if (res.locals.id !== userId) return res.status(401).json({ error: 'Unauthorized' });
 
     try {
-      product = await Product.create({ ...req.body });
+      let errors = {};
+      let productImages = [];
+      let defaultImageFile;
+      if (!req.files) {
+        errors.images = 'Please select at least a default image';
+        return res.status(400).json(errors)
+      }
+
+      if (req.files.productImages && !req.files.defaultImage) {
+        errors.images = 'Please add a default image';
+        return res.status(400).json(errors)
+      }
+
+      if (req.files.defaultImage) {
+
+        defaultImageFile = req.files.defaultImage;
+        if (!defaultImageFile.mimetype.startsWith('image')) {
+          errors.images = 'Invalid image';
+          return res.status(400).json(errors)
+        }
+        let ext = path.extname(defaultImageFile.name).toLowerCase()
+        let imgId = makeId(20);
+        let name = `${imgId}${ext}`;
+        productImages.push(name);
+        await defaultImageFile.mv(`images/${name}`)
+
+        image = { defaultImage: name }
+      }
+
+      if (req.files.productImages) {
+        let productImagesFile = req.files.productImages;
+        let exts = [];
+
+        for (let i = 0; i < productImagesFile.length; i++) {
+          if (!productImagesFile[i].mimetype.startsWith('image')) {
+            exts.push(productImagesFile[i].mimetype);
+          }
+        }
+
+        if (exts.length > 0) {
+          errors.images = 'Invalid Image'
+          return res.status(400).json(errors)
+        }
+
+        for (let i = 0; i < productImagesFile.length; i++) {
+          let name = `${makeId(20)}${path.extname(productImagesFile[i].name).toLowerCase()}`;
+          productImages.push(name);
+          productImagesFile[i].mv(`images/${name}`)
+        }
+
+        image = { ...image, productImages };
+      }
+
+      newProduct = {
+        ...req.body,
+        image
+      }
+
+      product = await Product();
+      product.productName = newProduct.productName
+      product.price = newProduct.price
+      product.category = newProduct.category
+      product.description = newProduct.description
+      product.user = newProduct.user
+      product.image = newProduct.image
       product.save();
 
       return res.status(200).json({ success: true, data: product });

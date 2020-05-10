@@ -29,8 +29,8 @@ function validateProduct(data) {
     errors.price = 'Field is required';
   }
 
-  if (!validator.isLength(data.description, { min: 10, max: 400 })) {
-    errors.description = 'Field must contain between 2 and 30 charcters';
+  if (!validator.isLength(data.description, { min: 2, max: 400 })) {
+    errors.description = 'Field must contain between  2 and 30 charcters';
   }
 
   if (validator.isEmpty(data.description)) {

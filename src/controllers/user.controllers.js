@@ -4,6 +4,10 @@ const responseStatus = require('../../utils/responseStatus');
 const validateReg = require('../../utils/validations/validateRegistration');
 const jwt = require('jsonwebtoken');
 const skipFunction = require('../../utils/skipFunction');
+const nodeMailer = require('nodemailer');
+const emailTemplate = require('../../utils/emailTemplates/TemplateRegistration')
+require('dotenv').config()
+const path = require('path')
 
 const userController = {
   async index(req, res, next) {
@@ -171,6 +175,40 @@ const userController = {
       return res.status(500).json({ error: 'Falha Interna' })
     }
   },
+
+  async registerEmail(req, res, next) {
+
+    const { email, firstname, lastname } = req.params;
+    console.log(req.params)
+
+    let transporter = nodeMailer.createTransport({
+      service: process.env.AUTH_SERVICE,
+      auth: { user: process.env.AUTH_EMAIL, pass: process.env.AUTH_PASS }
+    })
+
+    let mailOptions = {
+      from: process.env.AUTH_EMAIL,
+      to: email,
+      subject: 'Welcome to SpeedBids',
+      html: emailTemplate(firstname, lastname),
+      attachments: [{
+        filename: 'logo.png',
+        path: path.join(__dirname, '../', '../', 'utils', 'emailTemplates', 'logo.png'),
+        cid: 'unique@kreata.ee' //same cid value as in the html img src
+      }]
+    }
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        console.log('Sender:', info.envelope.from);
+        console.log('Reciever:', info.accepted[0]);
+        return res.status(200).json({ msg: 'Email Successfully Sent' });
+      }
+    })
+  }
 }
 
 module.exports = userController;

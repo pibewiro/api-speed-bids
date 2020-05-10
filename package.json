@@ -18,6 +18,7 @@
     "express-upload": "^0.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.11",
+    "nodemailer": "^6.4.6",
     "validator": "^13.0.0"
   },
   "devDependencies": {

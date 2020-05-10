@@ -18,7 +18,7 @@ class App {
     this.server.use(cors());
     this.server.use(express.json());
     this.server.use(morgan('dev'));
-    // this.server.use(fileUpload());
+    this.server.use(fileUpload());
   }
 
   routes() {
