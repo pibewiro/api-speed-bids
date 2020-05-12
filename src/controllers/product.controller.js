@@ -49,7 +49,7 @@ const productController = {
     let product;
 
     try {
-      product = await Product.findById(id);
+      product = await Product.findById(id).populate({ path: 'user', select: 'firstname lastname username' })
       return res.status(200).json({ success: true, data: product })
     } catch (err) {
       console.log(err);
@@ -104,21 +104,36 @@ const productController = {
         let productImagesFile = req.files.productImages;
         let exts = [];
 
-        for (let i = 0; i < productImagesFile.length; i++) {
-          if (!productImagesFile[i].mimetype.startsWith('image')) {
-            exts.push(productImagesFile[i].mimetype);
+        if (req.files.productImages.length > 1) {
+          for (let i = 0; i < productImagesFile.length; i++) {
+            if (!productImagesFile[i].mimetype.startsWith('image')) {
+              exts.push(productImagesFile[i].mimetype);
+            }
+          }
+
+          if (exts.length > 0) {
+            errors.images = 'Invalid Image'
+            return res.status(400).json(errors)
+          }
+
+          for (let i = 0; i < productImagesFile.length; i++) {
+            let name = `${makeId(20)}${path.extname(productImagesFile[i].name).toLowerCase()}`;
+            productImages.push(name);
+            productImagesFile[i].mv(`images/${name}`)
           }
         }
 
-        if (exts.length > 0) {
-          errors.images = 'Invalid Image'
-          return res.status(400).json(errors)
-        }
-
-        for (let i = 0; i < productImagesFile.length; i++) {
-          let name = `${makeId(20)}${path.extname(productImagesFile[i].name).toLowerCase()}`;
+        else {
+          console.log(req.files)
+          if (!req.files.productImages.mimetype.startsWith('image')) {
+            errors.images = 'Invalid image';
+            return res.status(400).json(errors)
+          }
+          let ext = path.extname(req.files.productImages.name).toLowerCase()
+          let imgId = makeId(20);
+          let name = `${imgId}${ext}`;
           productImages.push(name);
-          productImagesFile[i].mv(`images/${name}`)
+          await req.files.productImages.mv(`images/${name}`)
         }
 
         image = { ...image, productImages };
@@ -188,6 +203,36 @@ const productController = {
       return res.status(500).json({ error: 'Falha Interna' });
     }
   },
+
+  async getMyProducts(req, res, next) {
+    const userId = req.params.id;
+    if (res.locals.id !== req.params.id) return res.status(401).json({ error: 'Unauthorized' })
+
+    try {
+      const product = await Product.find({ user: userId })
+      return res.status(200).json({ succes: true, data: product })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ error: 'Falha Interna' })
+    }
+  },
+
+  async getSimilarProducts(req, res, next) {
+
+    const { id, category } = req.params;
+
+    try {
+
+      const product = await Product.find({ _id: { $ne: id }, category });
+
+      return res.status(200).json({ succes: true, data: product });
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ error: 'Falha Interna' });
+    }
+  },
+
+
 }
 
 module.exports = productController;
