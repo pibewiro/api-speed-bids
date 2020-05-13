@@ -160,19 +160,25 @@ const productController = {
   },
 
   async update(req, res, next) {
-
     const { id } = req.params;
-    const userId = req.body.user;
+    const userId = req.body.user._id;
     let product;
 
     if (res.locals.id !== userId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { errors, isValid } = validateProduct(req.body);
-    if (!isValid) return res.status(401).json(errors);
+    // const { errors, isValid } = validateProduct(req.body);
+    // if (!isValid) return res.status(401).json(errors);
 
     try {
-      product = await Product.updateOne({ _id: id }, { ...req.body });
-      return res.status(200).json({ success: true, msg: 'Product Successfully Updated' })
+      product = await Product.findById(id);
+      product.productName = req.body.productName;
+      product.price = req.body.price;
+      product.category = req.body.category;
+      product.description = req.body.description;
+      product.save();
+
+      let product2 = await Product.findById(id);
+      return res.status(200).json({ success: true, msg: 'Product Successfully Updated', data: product })
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' });
@@ -231,6 +237,38 @@ const productController = {
       return res.status(500).json({ error: 'Falha Interna' });
     }
   },
+
+  async deleteImage(req, res, next) {
+    const { name, id } = req.params;
+    let product;
+
+    let imgs = [];
+
+    try {
+      product = await Product.findById(id);
+
+      if (!product) return res.status(404).json({ error: 'No Product found' });
+
+      if (product.image.defaultImage === name) {
+        imgs = product.image.productImages;
+        imgs.shift();
+        imgs.unshift('name')
+        console.log(imgs)
+        // console.log(imgs)
+      }
+
+      else {
+        imgs = product.image.productImages.filter(res => res !== name);
+      }
+
+      // product.image.productImages = imgs;
+      // product.save();
+      // return res.status(200).json({ data: product })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ error: 'Falha Interna' })
+    }
+  }
 
 
 }

@@ -8,6 +8,7 @@ const nodeMailer = require('nodemailer');
 const emailTemplate = require('../../utils/emailTemplates/TemplateRegistration')
 require('dotenv').config()
 const path = require('path')
+const makeId = require('../../utils/makeId');
 
 const userController = {
   async index(req, res, next) {
@@ -41,6 +42,7 @@ const userController = {
     }
   },
   async store(req, res, next) {
+    console.log(req.body)
     let { username, email, cpf } = req.body;
 
     let { isValid, errors } = validateReg(req.body);
@@ -76,6 +78,7 @@ const userController = {
       req.body.password = await hashPassword(req.body.password);
       req.body.active = true;
       req.body.type = 'user';
+      req.body.image = 'default.jpg'
 
       const user = await User.create({ ...req.body });
       user.save();
@@ -107,21 +110,20 @@ const userController = {
   async update(req, res, next) {
 
     let { username, email, cpf } = req.body;
-    let { isValid, errors } = validateReg(req.body);
+    // let { isValid, errors } = validateReg(req.body);
 
-    if (!isValid) return res.status(400).json(errors);
+    // if (!isValid) return res.status(400).json(errors);
 
     const token = req.headers['x-access-token'];
     let user;
     const type = jwt.decode(token).type;
 
     const { id } = req.params
-
     if (id !== res.locals.id && type !== 'master') return res.status(401).json({ error: 'Unauthorized' });
 
     try {
       try {
-        const user = await User.findOne({ $or: [{ username }, { email }, { cpf }], $and: [{ _id: { $ne: id } }] })
+        user = await User.findOne({ $or: [{ username }, { email }, { cpf }], $and: [{ _id: { $ne: id } }] })
 
         if (user) {
           let errors = {};
@@ -144,10 +146,31 @@ const userController = {
         console.log(err)
       }
 
-      user = await User.updateOne({ _id: id }, { ...req.body });
-      if (!user) return res.status(404).json({ error: 'No user found' });
+      let user2 = await User.findById(id);
+      if (!user2) return res.status(404).json({ error: 'No user found' });
 
-      return res.status(200).json({ msg: 'User updated' });
+      if (req.files) {
+        if (user2.image !== req.files.userImage.name) {
+          let errors = {}
+          const img = req.files.userImage;
+          if (!img.mimetype.startsWith('image')) {
+            errors.image = "Must be am image file"
+            return res.status('400').json(errors)
+          }
+          const ext = path.extname(img.name).toLowerCase();
+          let imgName = makeId(20);
+          imgName = `${imgName}${ext}`;
+          req.body.image = imgName;
+          img.mv(`images/${imgName}`)
+        }
+      }
+
+
+      await User.updateOne({ _id: id }, { ...req.body });
+
+      const user3 = await User.findById(id)
+      console.log(user2)
+      return res.status(200).json({ data: user3 });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' })
