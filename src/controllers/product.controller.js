@@ -139,6 +139,7 @@ const productController = {
         image = { ...image, productImages };
       }
 
+      image = { ...image, productImages }
       newProduct = {
         ...req.body,
         image
@@ -242,32 +243,69 @@ const productController = {
     const { name, id } = req.params;
     let product;
 
-    let imgs = [];
 
     try {
       product = await Product.findById(id);
 
       if (!product) return res.status(404).json({ error: 'No Product found' });
 
-      if (product.image.defaultImage === name) {
-        imgs = product.image.productImages;
-        imgs.shift();
-        imgs.unshift('name')
-        console.log(imgs)
-        // console.log(imgs)
-      }
+      let imgs = [];
+      imgs = product.image.productImages.filter(res => res !== name);
+      product.image.productImages = imgs;
+      product.save();
 
-      else {
-        imgs = product.image.productImages.filter(res => res !== name);
-      }
-
-      // product.image.productImages = imgs;
-      // product.save();
-      // return res.status(200).json({ data: product })
+      return res.status(200).json({ data: product })
     } catch (err) {
       console.log(err)
       return res.status(500).json({ error: 'Falha Interna' })
     }
+  },
+
+  async updateDefaulImage(req, res, next) {
+    console.log(req.files);
+    console.log(req.body);
+    let error = {};
+
+    const { id } = req.body;
+    let product;
+
+    if (!req.files) {
+      error.image = "Default image required";
+
+      return res.status(404).json(error)
+    }
+
+    try {
+      product = await Product.findById(id);
+
+      if (!product) return res.status(404).json({ error: 'No product found' })
+
+      let imgs, img, name, ext;
+
+      if (!req.files.newDefaultImage.mimetype.startsWith('image')) {
+        error.image = 'Must be an image file';
+        return res.status(400).json(error)
+      }
+
+      img = req.files.newDefaultImage;
+      name = makeId(20);
+      ext = path.extname(img.name).toLowerCase();
+      name = `${name}${ext}`
+      product.image.defaultImage = name;
+
+      imgs = product.image.productImages;
+      imgs.shift();
+      imgs.unshift(name);
+      product.image.productImages = imgs;
+      img.mv(`images/${name}`)
+      product.save();
+      return res.status(200).json({ data: product })
+
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: 'Falha Interna' })
+    }
+
   }
 
 
