@@ -30,7 +30,7 @@ const productController = {
       }
 
       else {
-        product = await Product.find()
+        product = await Product.find({ active: true })
           .populate({ path: 'user', select: 'firstname lastname username' })
           .sort({ createdAt: -1 });
 
@@ -66,6 +66,7 @@ const productController = {
     let product;
     let newProduct;
     let image;
+    let defaultImage;
     const userId = req.body.user;
 
     if (res.locals.id !== userId) return res.status(401).json({ error: 'Unauthorized' });
@@ -94,10 +95,9 @@ const productController = {
         let ext = path.extname(defaultImageFile.name).toLowerCase()
         let imgId = makeId(20);
         let name = `${imgId}${ext}`;
-        productImages.push(name);
         await defaultImageFile.mv(`images/${name}`)
 
-        image = { defaultImage: name }
+        defaultImage = name;
       }
 
       if (req.files.productImages) {
@@ -135,23 +135,16 @@ const productController = {
           productImages.push(name);
           await req.files.productImages.mv(`images/${name}`)
         }
-
-        image = { ...image, productImages };
-      }
-
-      image = { ...image, productImages }
-      newProduct = {
-        ...req.body,
-        image
       }
 
       product = await Product();
-      product.productName = newProduct.productName
-      product.price = newProduct.price
-      product.category = newProduct.category
-      product.description = newProduct.description
-      product.user = newProduct.user
-      product.image = newProduct.image
+      product.productName = req.body.productName;
+      product.price = req.body.price;
+      product.category = req.body.category;
+      product.description = req.body.description;
+      product.user = req.body.user;
+      product.image.defaultImage = defaultImage;
+      product.image.productImages = productImages;
       product.save();
 
       return res.status(200).json({ success: true, data: product });
@@ -178,7 +171,6 @@ const productController = {
       product.description = req.body.description;
       product.save();
 
-      let product2 = await Product.findById(id);
       return res.status(200).json({ success: true, msg: 'Product Successfully Updated', data: product })
     } catch (err) {
       console.log(err);
@@ -188,19 +180,27 @@ const productController = {
 
   async delete(req, res, next) {
 
-    const { id } = req.params;
-    const userId = req.body.user;
-    let product, user;
+    const { id, productName } = req.params;
+    let product, product2, user;
+    let error = {};
 
     try {
 
       try {
         user = await User.findById((res.locals.id));
+        const userId = user._id;
+        if (res.locals.id != user._id && user.type !== 'master') return res.status(401).json({ error: 'Unauthorized' });
 
-        if (res.locals.id !== userId && user.type !== 'master') return res.status(401).json({ error: 'Unauthorized' });
       } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Falha Interna' })
+      }
+
+      product2 = await Product.findById(id);
+
+      if (product2.productName !== productName) {
+        error.productName = 'Wrong name'
+        return res.status(400).json(error)
       }
 
       product = await Product.updateOne({ _id: id }, { active: false });
@@ -262,8 +262,6 @@ const productController = {
   },
 
   async updateDefaulImage(req, res, next) {
-    console.log(req.files);
-    console.log(req.body);
     let error = {};
 
     const { id } = req.body;
@@ -292,20 +290,43 @@ const productController = {
       ext = path.extname(img.name).toLowerCase();
       name = `${name}${ext}`
       product.image.defaultImage = name;
-
-      imgs = product.image.productImages;
-      imgs.shift();
-      imgs.unshift(name);
-      product.image.productImages = imgs;
       img.mv(`images/${name}`)
       product.save();
+      return res.status(200).json({ data: product });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: 'Falha Interna' })
+    }
+
+  },
+
+  async addProductImages(req, res, next) {
+    let img = req.files.addedProductImage;
+    let name, ext, product;
+    const id = req.params.id;
+
+    if (!img.mimetype.startsWith('image')) {
+      let error = {};
+      error.image = 'Only image files';
+      return res.status(400).json(error);
+    }
+
+    try {
+      product = await Product.findById(id);
+      if (!product) return res.status(404).json({ error: 'User not found' });
+
+      name = makeId(20);
+      ext = path.extname(img.name).toLowerCase();
+      name = `${name}${ext}`;
+      product.image.productImages.push(name);
+      product.save();
+      img.mv(`images/${name}`);
       return res.status(200).json({ data: product })
 
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' })
     }
-
   }
 
 

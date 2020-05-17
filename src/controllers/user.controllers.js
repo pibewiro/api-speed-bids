@@ -42,7 +42,6 @@ const userController = {
     }
   },
   async store(req, res, next) {
-    console.log(req.body)
     let { username, email, cpf } = req.body;
 
     let { isValid, errors } = validateReg(req.body);
@@ -50,12 +49,11 @@ const userController = {
     if (!isValid) return res.status(400).json(errors);
 
     try {
-
+      let errors = {};
       try {
-        const user = await User.findOne({ $or: [{ username }, { email }, { cpf }] })
-
+        const user = await User.findOne({ active: true, $or: [{ username }, { email }, { cpf }] })
+        console.log(user)
         if (user) {
-          let errors = {};
 
           if (user.username === username) {
             errors.username = 'User Already Exists';
@@ -68,7 +66,7 @@ const userController = {
           if (user.cpf === cpf) {
             errors.cpf = 'CPF Already Exists';
           }
-
+          console.log(errors)
           return res.status(400).json(errors)
         }
       } catch (err) {
