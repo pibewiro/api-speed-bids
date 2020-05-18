@@ -9,6 +9,7 @@ const emailTemplate = require('../../utils/emailTemplates/TemplateRegistration')
 require('dotenv').config()
 const path = require('path')
 const makeId = require('../../utils/makeId');
+const validateEditUser = require('../../utils/validations/validateEditUser');
 
 const userController = {
   async index(req, res, next) {
@@ -106,11 +107,16 @@ const userController = {
   },
 
   async update(req, res, next) {
-
     let { username, email, cpf } = req.body;
-    // let { isValid, errors } = validateReg(req.body);
+    let userData = {};
+    let address = {};
 
-    // if (!isValid) return res.status(400).json(errors);
+    address.city = req.body.city;
+    address.state = req.body.state;
+    address.country = req.body.country;
+    userData = { ...req.body, address }
+    let { isValid, errors } = validateEditUser(userData);
+    if (!isValid) return res.status(400).json(errors);
 
     const token = req.headers['x-access-token'];
     let user;
@@ -148,6 +154,7 @@ const userController = {
       if (!user2) return res.status(404).json({ error: 'No user found' });
 
       if (req.files) {
+        console.log(req.files)
         if (user2.image !== req.files.userImage.name) {
           let errors = {}
           const img = req.files.userImage;
@@ -158,16 +165,15 @@ const userController = {
           const ext = path.extname(img.name).toLowerCase();
           let imgName = makeId(20);
           imgName = `${imgName}${ext}`;
-          req.body.image = imgName;
+          userData.image = imgName;
           img.mv(`images/${imgName}`)
         }
       }
 
 
-      await User.updateOne({ _id: id }, { ...req.body });
+      await User.updateOne({ _id: id }, { ...userData });
 
-      const user3 = await User.findById(id)
-      console.log(user2)
+      const user3 = await User.findById(id);
       return res.status(200).json({ data: user3 });
     } catch (err) {
       console.log(err);
