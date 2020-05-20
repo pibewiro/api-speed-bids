@@ -18,7 +18,6 @@ const userController = {
     let page = req.query.page;
 
     const obj = skipFunction(req, limit, page);
-    console.log(obj)
 
     try {
 

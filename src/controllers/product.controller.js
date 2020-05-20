@@ -213,10 +213,10 @@ const productController = {
 
   async getMyProducts(req, res, next) {
     const userId = req.params.id;
-    if (res.locals.id !== req.params.id) return res.status(401).json({ error: 'Unauthorized' })
+    // if (res.locals.id !== req.params.id) return res.status(401).json({ error: 'Unauthorized' })
 
     try {
-      const product = await Product.find({ user: userId })
+      const product = await Product.find({ user: userId }).sort({ createdAt: 'desc' })
       return res.status(200).json({ succes: true, data: product })
     } catch (err) {
       console.log(err)
@@ -230,9 +230,8 @@ const productController = {
 
     try {
 
-      const product = await Product.find({ _id: { $ne: id }, category });
-
-      return res.status(200).json({ succes: true, data: product });
+      const product = await Product.find({ _id: { $ne: id }, category }).populate({ path: 'user', select: 'username' })
+      return res.status(200).json({ succes: true, data: product })
     } catch (err) {
       console.log(err)
       return res.status(500).json({ error: 'Falha Interna' });
@@ -327,6 +326,82 @@ const productController = {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' })
     }
+  },
+
+  async filterProducts(req, res, next) {
+    let = { productName, category, minPrice, maxPrice, sortPrice, sortDate } = req.query;
+    let query = {};
+    let sort = {};
+    let product;
+
+    if (productName) {
+      query = { productName }
+    }
+
+    if (category) {
+      query = { ...query, category }
+    }
+
+    if (minPrice) {
+      query = { ...query, price: { '$gte': minPrice } }
+    }
+
+    if (maxPrice) {
+      query = { ...query, price: { '$lte': maxPrice } }
+    }
+
+    if (minPrice && maxPrice) {
+      query = { ...query, price: { $gte: minPrice, $lte: maxPrice } }
+    }
+
+    query = { ...query, active: true }
+
+    if (sortDate) {
+      switch (sortDate) {
+        case 'newOld':
+          sort = { createdAt: 'desc' };
+          break;
+
+        case 'oldNew':
+          sort = { createdAt: 'asc' };
+          break;
+      }
+    }
+
+    if (sortPrice) {
+      switch (sortPrice) {
+        case 'highLow':
+          sort = { ...sort, price: 'desc' };
+          break;
+
+        case 'lowHigh':
+          sort = { ...sort, price: 'asc' };
+          break;
+      }
+    }
+    try {
+
+      if (sortPrice || sortDate) {
+        product = await Product.find(query)
+          .populate({ path: 'user', select: 'username' }).sort(sort)
+      }
+
+      else {
+        product = await Product.find(query)
+          .sort({ createdAt: 'desc' })
+          .populate({ path: 'user', select: 'username' })
+      }
+
+
+      return res.status(200).json({ data: product })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ error: 'falha interna' })
+    }
+
+
+
+
   }
 
 
