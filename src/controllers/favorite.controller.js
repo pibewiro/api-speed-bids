@@ -2,7 +2,7 @@ const Favorite = require('../models/favorites');
 const Product = require('../models/product');
 
 const favoriteController = {
-  async getFavorite(req, res, send) {
+  async getFavorite(req, res, next) {
     const { userId } = req.params;
     let favorite;
 
@@ -60,16 +60,36 @@ const favoriteController = {
         return res.status(200).json({ success: true, data: favorite })
 
       }
-
-
-
-
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' })
     }
 
   },
+
+  async getFavoriteProducts(req, res, next) {
+    const { userId } = req.params;
+    let favorite, product;
+    let favoriteProducts = [];
+
+    try {
+      favorite = await Favorite.findOne({ user: userId });
+
+      if (favorite) {
+        favorite.productDetails.map(res => {
+          if (res.active) {
+            favoriteProducts.push(res.productId);
+          }
+        })
+        product = await Product.find({ _id: favoriteProducts })
+          .populate({ path: 'user', select: 'username' });
+        return res.status(200).json({ data: product })
+      }
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: 'Falha Interna' })
+    }
+  }
 }
 
 module.exports = favoriteController;
