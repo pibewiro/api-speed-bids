@@ -4,7 +4,8 @@ const validateProduct = require('../../utils/validations/validateProduct');
 const skipFunction = require('../../utils/skipFunction');
 const makeId = require('../../utils/makeId')
 const User = require('../models/user');
-const path = require('path')
+const path = require('path');
+const Buyer = require('../models/buyer');
 
 const productController = {
 
@@ -138,6 +139,8 @@ const productController = {
       }
 
       product = await Product();
+      buyer = await Buyer();
+      let endDate = `${req.body.endDate}T${req.body.endTime}.000-03:00`;
       product.productName = req.body.productName;
       product.price = req.body.price;
       product.category = req.body.category;
@@ -145,7 +148,12 @@ const productController = {
       product.user = req.body.user;
       product.image.defaultImage = defaultImage;
       product.image.productImages = productImages;
+      product.endDate = endDate;
       product.save();
+
+      buyer.product = product._id,
+        buyer.currentPrice = product.price,
+        buyer.save();
 
       return res.status(200).json({ success: true, data: product });
     } catch (err) {

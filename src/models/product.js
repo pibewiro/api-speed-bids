@@ -8,6 +8,7 @@ const productSchema = Schema({
   description: { type: String, required: true },
   category: { type: String, required: true },
   image: { defaultImage: { type: String }, productImages: [String] },
+  endDate: { type: Date },
   active: { type: Boolean, default: true }
 }, { timestamps: true });
 
