@@ -5,8 +5,9 @@ const product = require('./product');
 const favorite = require('./favorite');
 const follow = require('./follow');
 const buyer = require('./buyer');
+const purchase = require('./purchase');
 
-const routes = [user, auth, product, favorite, follow, buyer];
+const routes = [user, auth, product, favorite, follow, buyer, purchase];
 
 router.use(routes);
 

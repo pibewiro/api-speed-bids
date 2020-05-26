@@ -7,7 +7,7 @@ const BuyerController = {
     let buyer;
 
     try {
-      buyer = await Buyer.findOne({ product: productId })
+      buyer = await Buyer.findOne({ product: productId, active: true })
         .populate({ path: 'prices.buyerId', select: 'username' })
 
       let reverseArray;
@@ -30,10 +30,12 @@ const BuyerController = {
     const { price, userId } = req.body;
     const { productId } = req.params;
 
-    let buyer;
+    let buyer, validateNum, checkNumber;
     let error = {};
 
-    if (typeof price != Number || !price) {
+    validateNum = /^\d*$/g;
+    checkNumber = validateNum.test(price);
+    if (!checkNumber || !price) {
       error.price = 'A number is required'
       return res.status(400).json(error)
     }
@@ -55,7 +57,7 @@ const BuyerController = {
         }
 
         else {
-          return false
+          return false;
         }
       });
 
@@ -67,8 +69,8 @@ const BuyerController = {
 
       buyer.prices.push({ buyerId: userId, price, dateAdded: new Date() })
       buyer.currentPrice = price;
+      buyer.winner = userId;
       await buyer.save();
-
 
       return res.status(200).json({ data: `Price has been updated to R$${price}` });
     } catch (err) {

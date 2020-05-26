@@ -5,6 +5,8 @@ const morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 const routes = require('../src/routes');
 const connectDB = require('./database');
+const runBot = require('../helpers/bot');
+const env = process.env.NODE_ENV
 
 class App {
   constructor() {
@@ -12,6 +14,10 @@ class App {
     this.middlewares();
     this.routes();
     this.database();
+
+    if (!env) {
+      this.bot();
+    }
   }
 
   middlewares() {
@@ -28,6 +34,11 @@ class App {
 
   database() {
     connectDB();
+  }
+
+
+  bot() {
+    runBot();
   }
 }
 
