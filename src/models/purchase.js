@@ -7,7 +7,7 @@ const PurchaseSchema = new Schema({
   product: { type: mongoose.Schema.ObjectId, ref: "Product", required: true },
   buyer: { type: mongoose.Schema.ObjectId, ref: 'Buyer', required: true },
   status: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
-  price: { type: Number }
+  price: { type: Number },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Purchase', PurchaseSchema);
