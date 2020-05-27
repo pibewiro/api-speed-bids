@@ -33,7 +33,7 @@ const purchaseController = {
   },
 
   async checkout(req, res, next) {
-    console.log(req.headers.origin)
+    console.log(req.headers.origin);
     const { purchaseId } = req.params;
     let purchase;
     let sessionData = {};
