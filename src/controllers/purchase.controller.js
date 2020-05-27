@@ -33,12 +33,19 @@ const purchaseController = {
   },
 
   async checkout(req, res, next) {
+<<<<<<< HEAD
     console.log(req.headers.origin)
+=======
+    console.log(req.headers.origin);
+>>>>>>> bf24bf440b270180057b0302c7181236c4f771d5
     const { purchaseId } = req.params;
     let purchase;
     let sessionData = {};
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> bf24bf440b270180057b0302c7181236c4f771d5
     try {
       purchase = await Purchase.findById(purchaseId)
         .populate({ path: 'product', select: 'productName' });
