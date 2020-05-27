@@ -22,15 +22,16 @@ async function checkProducts() {
 
   buyer.map(async res => {
     res.active = false;
-    res.save();
-
-    purchase = await Purchase();
-    purchase.user = res.winner,
-      purchase.owner = res.product.user,
-      purchase.product = res.product._id,
-      purchase.buyer = res._id,
-      purchase.price = res.currentPrice,
-      purchase.save();
+    await res.save();
+    if (res.prices.length != 0) {
+      purchase = await Purchase();
+      purchase.user = res.winner,
+        purchase.owner = res.product.user,
+        purchase.product = res.product._id,
+        purchase.buyer = res._id,
+        purchase.price = res.currentPrice,
+        purchase.save();
+    }
   })
 
   console.log('Products Checked');

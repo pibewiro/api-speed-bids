@@ -21,7 +21,6 @@ const purchaseController = {
   async updateStatus(req, res, next) {
     console.log(req.params)
     const { purchaseId } = req.params;
-    let purchase;
 
     try {
       await Purchase.updateOne({ _id: purchaseId }, { status: 'Paid' });
@@ -46,7 +45,7 @@ const purchaseController = {
       sessionData = {
         payment_method_types: ['card'],
         line_items: [{
-          amount: purchase.price,
+          amount: purchase.price * 100,
           quantity: 1,
           currency: 'usd',
           name: purchase.product.productName,
