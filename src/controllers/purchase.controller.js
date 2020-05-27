@@ -33,7 +33,7 @@ const purchaseController = {
   },
 
   async checkout(req, res, next) {
-    console.log(req.params);
+    console.log(req.headers.origin)
     const { purchaseId } = req.params;
     let purchase;
     let sessionData = {};
@@ -52,7 +52,7 @@ const purchaseController = {
           description: 'Speed Buyer'
         }],
         mode: 'payment',
-        success_url: `http://localhost:8080/payment-success/${purchaseId}`,
+        success_url: `${req.headers.origin}/payment-success/${purchaseId}`,
         cancel_url: 'http://localhost:8080/purchases',
       }
 
