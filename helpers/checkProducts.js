@@ -4,7 +4,6 @@ const Purchase = require('../src/models/purchase');
 const nodemailer = require('nodemailer');
 
 async function checkProducts() {
-  console.log('Checking Products...')
   let product, buyer, purchase;
   let productId = [];
 
@@ -33,26 +32,6 @@ async function checkProducts() {
         purchase.save();
     }
   })
-
-  console.log('Products Checked');
-
-  // let transporter = nodemailer.createTransport({
-  //   service: process.env.AUTH_SERVICE,
-  //   auth: { user: process.env.AUTH_EMAIL, pass: process.env.PASS }
-  // })
-
-  // buyer.map(res => {
-  //   let mailOptions = {
-  //     from: process.env.AUTH_EMAIL,
-  //     to: res.winner.user.
-  //       subject: 'Product Bought',
-  //   }
-  // })
-
-
-
-
-
 }
 
 module.exports = checkProducts;
