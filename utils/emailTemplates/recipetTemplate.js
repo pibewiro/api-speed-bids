@@ -16,6 +16,7 @@ function recieptTemplate(data) {
         text-align: center;
         font-weight: 100;
         padding: 10px;
+        font-size:20px;
       }
   
       span {
@@ -26,7 +27,10 @@ function recieptTemplate(data) {
         line-height: 2em;
         width: 50%;
         margin: 10px auto;
+        font-size:10px;
       }
+
+
   
       .img-div {
         width: 100px;
