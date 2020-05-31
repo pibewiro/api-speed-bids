@@ -1,5 +1,9 @@
 const Purchase = require('../models/purchase');
+const pdf = require('html-pdf');
+const path = require('path')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const moment = require('moment');
+const recieptTemplate = require('../../utils/emailTemplates/recipetTemplate');
 
 const purchaseController = {
   async index(req, res, next) {
@@ -65,6 +69,36 @@ const purchaseController = {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' })
     }
+  },
+
+  async downloadReciept(req, res, next) {
+
+    const { purchaseId } = req.params;
+    let purchase;
+    purchase = await Purchase.findById(purchaseId)
+      .populate({ path: 'user', select: 'firstname lastname' })
+      .populate({ path: 'owner', select: 'firstname lastname' })
+      .populate({ path: 'product', select: 'productName price' })
+
+    const recieptData = {
+      id: purchase._id,
+      productName: purchase.product.productName,
+      user: { firstname: purchase.user.firstname, lastname: purchase.user.lastname },
+      owner: { firstname: purchase.owner.firstname, lastname: purchase.owner.lastname },
+      price: purchase.price,
+      date: moment(purchase.createdAt).format('DD/MM/YYYY')
+    }
+
+    let imgPath = path.join(__dirname + "../../../utils/emailTemplates/");
+    imgPath = imgPath.replace(new RegExp(/\\/g), '/')
+    const options = {
+      "type": "pdf",
+      "base": `file:///${imgPath}`
+    }
+    pdf.create(recieptTemplate(recieptData), options).toBuffer((err, data) => {
+      res.send(data);
+    })
+
   }
 };
 
