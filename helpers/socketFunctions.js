@@ -12,6 +12,7 @@ function socketFunctions(server) {
       socket.broadcast.to(data.bidId).emit("logInMessage", {
         info: `has joined the live bid ${data.bidId}`,
         id: data.bidId,
+        username: data.username,
       });
     });
 
@@ -20,6 +21,7 @@ function socketFunctions(server) {
       io.to(data.bidId).emit("bid2", {
         info: data.price,
         userId: data.userId,
+        username: data.username,
       });
     });
   });
