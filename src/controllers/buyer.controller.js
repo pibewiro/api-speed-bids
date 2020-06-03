@@ -16,7 +16,9 @@ const BuyerController = {
 
       let buyerData = {
         prices: reverseArray,
-        currentPrice: buyer.currentPrice
+        currentPrice: buyer.currentPrice,
+        bidType: buyer.bidType,
+        _id: buyer._id
       }
 
       return res.status(200).json({ data: buyerData });
@@ -76,6 +78,45 @@ const BuyerController = {
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Falha Interna' });
+    }
+  },
+
+  async addLiveBidder(req, res, next) {
+    const { userId, buyerId } = req.body;
+    let buyer;
+    let error = {}
+
+    try {
+      buyer = await Buyer.findById(buyerId);
+      const checkUser = buyer.liveBidders.includes(userId);
+
+      if (checkUser) {
+        error.liveBidder = 'You have already joined this bidding Session'
+        return res.status(400).json(error)
+      }
+
+      buyer.liveBidders.push(userId);
+      buyer.save();
+      return res.status(200).json('Buyer Added');
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ error: "Falha Interna" })
+    }
+  },
+
+  async viewBids(req, res, next) {
+    const { userId } = req.params;
+    let buyer;
+
+    try {
+      buyer = await Buyer.find({ liveBidders: { $in: userId } })
+        .populate({ path: 'product' })
+        .populate({ path: 'owner', select: 'username' })
+        .sort({ liveStatus: -1 });
+      return res.status(200).json({ data: buyer })
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: 'Falha Interna' })
     }
   }
 }

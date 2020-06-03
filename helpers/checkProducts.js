@@ -20,16 +20,18 @@ async function checkProducts() {
     .populate({ path: 'product', select: 'user' })
 
   buyer.map(async res => {
-    res.active = false;
-    await res.save();
-    if (res.prices.length != 0) {
-      purchase = await Purchase();
-      purchase.user = res.winner,
-        purchase.owner = res.product.user,
-        purchase.product = res.product._id,
-        purchase.buyer = res._id,
-        purchase.price = res.currentPrice,
-        purchase.save();
+    if (res.bidType === 'Standard') {
+      res.active = false;
+      await res.save();
+      if (res.prices.length != 0) {
+        purchase = await Purchase();
+        purchase.user = res.winner,
+          purchase.owner = res.product.user,
+          purchase.product = res.product._id,
+          purchase.buyer = res._id,
+          purchase.price = res.currentPrice,
+          purchase.save();
+      }
     }
   })
 }
