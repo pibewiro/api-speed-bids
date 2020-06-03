@@ -1,6 +1,11 @@
-const app = require('./config/server');
-require('dotenv').config();
+const app = require("./config/server");
+const socketIO = require("./helpers/socketFunctions");
+require("dotenv").config();
 
 const port = process.env.PORT || 9000;
 
-app.listen(port, () => console.log('Listening to Port Number:', port))
+const server = app.listen(port, () =>
+  console.log("Listening to Port Number:", port)
+);
+
+socketIO(server);

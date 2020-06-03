@@ -59,7 +59,7 @@ const productController = {
   },
 
   async store(req, res, next) {
-
+    console.log(req.body)
     const { isValid, errors } = validateProduct(req.body);
 
     if (!isValid) return res.status(400).json(errors);
@@ -153,7 +153,9 @@ const productController = {
 
       buyer.product = product._id,
         buyer.currentPrice = product.price,
-        buyer.save();
+        buyer.bidType = req.body.bidType;
+      buyer.owner = req.body.user;
+      buyer.save();
 
       return res.status(200).json({ success: true, data: product });
     } catch (err) {
