@@ -1,14 +1,15 @@
-const Buyer = require('../models/buyer');
+const Buyer = require("../models/buyer");
 
 const BuyerController = {
-
   async index(req, res, next) {
     const { productId } = req.params;
     let buyer;
 
     try {
-      buyer = await Buyer.findOne({ product: productId, active: true })
-        .populate({ path: 'prices.buyerId', select: 'username' })
+      buyer = await Buyer.findOne({
+        product: productId,
+        active: true,
+      }).populate({ path: "prices.buyerId", select: "username" });
 
       let reverseArray;
       reverseArray = buyer.prices;
@@ -18,13 +19,29 @@ const BuyerController = {
         prices: reverseArray,
         currentPrice: buyer.currentPrice,
         bidType: buyer.bidType,
-        _id: buyer._id
-      }
+        _id: buyer._id,
+      };
 
       return res.status(200).json({ data: buyerData });
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: 'Falha Interna' })
+      return res.status(500).json({ error: "Falha Interna" });
+    }
+  },
+
+  async get(req, res, next) {
+    const { buyerId } = req.params;
+    let buyer;
+    try {
+      buyer = await Buyer.findById(buyerId)
+        .populate({ path: "owner", select: "username firstname lastname" })
+        .populate({ path: "product" })
+        .populate({ path: "winner", select: "username firstname lastname" });
+
+      return res.status(200).json({ data: buyer });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(err);
     }
   },
 
@@ -38,69 +55,70 @@ const BuyerController = {
     validateNum = /^\d*$/g;
     checkNumber = validateNum.test(price);
     if (!checkNumber || !price) {
-      error.price = 'A number is required'
-      return res.status(400).json(error)
+      error.price = "A number is required";
+      return res.status(400).json(error);
     }
 
     try {
-      buyer = await Buyer.findOne({ product: productId })
-        .populate({ path: 'prices.buyerId', select: 'username' })
+      buyer = await Buyer.findOne({ product: productId }).populate({
+        path: "prices.buyerId",
+        select: "username",
+      });
 
       if (buyer.prices.length === 0) {
         if (buyer.currentPrice >= price) {
-          error.price = 'Price Must be higher than the current bid'
+          error.price = "Price Must be higher than the current bid";
           return res.status(400).json(error);
         }
       }
 
-      let check = buyer.prices.map(res => {
+      let check = buyer.prices.map((res) => {
         if (res.price >= price) {
           return true;
-        }
-
-        else {
+        } else {
           return false;
         }
       });
 
       if (check.includes(true)) {
-        error.price = 'Price Must be higher than the current bid'
+        error.price = "Price Must be higher than the current bid";
         return res.status(400).json(error);
       }
 
-
-      buyer.prices.push({ buyerId: userId, price, dateAdded: new Date() })
+      buyer.prices.push({ buyerId: userId, price, dateAdded: new Date() });
       buyer.currentPrice = price;
       buyer.winner = userId;
       await buyer.save();
 
-      return res.status(200).json({ data: `Price has been updated to R$${price}` });
+      return res
+        .status(200)
+        .json({ data: `Price has been updated to R$${price}` });
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: 'Falha Interna' });
+      return res.status(500).json({ error: "Falha Interna" });
     }
   },
 
   async addLiveBidder(req, res, next) {
     const { userId, buyerId } = req.body;
     let buyer;
-    let error = {}
+    let error = {};
 
     try {
       buyer = await Buyer.findById(buyerId);
       const checkUser = buyer.liveBidders.includes(userId);
 
       if (checkUser) {
-        error.liveBidder = 'You have already joined this bidding Session'
-        return res.status(400).json(error)
+        error.liveBidder = "You have already joined this bidding Session";
+        return res.status(400).json(error);
       }
 
       buyer.liveBidders.push(userId);
       buyer.save();
-      return res.status(200).json('Buyer Added');
+      return res.status(200).json("Buyer Added");
     } catch (err) {
-      console.log(err)
-      return res.status(500).json({ error: "Falha Interna" })
+      console.log(err);
+      return res.status(500).json({ error: "Falha Interna" });
     }
   },
 
@@ -109,16 +127,16 @@ const BuyerController = {
     let buyer;
 
     try {
-      buyer = await Buyer.find({ liveBidders: { $in: userId } })
-        .populate({ path: 'product' })
-        .populate({ path: 'owner', select: 'username' })
+      buyer = await Buyer.find({ liveBidders: { $in: userId }, active: true })
+        .populate({ path: "product" })
+        .populate({ path: "owner", select: "username" })
         .sort({ liveStatus: -1 });
-      return res.status(200).json({ data: buyer })
+      return res.status(200).json({ data: buyer });
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: 'Falha Interna' })
+      return res.status(500).json({ error: "Falha Interna" });
     }
-  }
-}
+  },
+};
 
 module.exports = BuyerController;
