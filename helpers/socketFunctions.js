@@ -22,7 +22,7 @@ function socketFunctions(server) {
         let seconds = time % 60;
         seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        if (`${minutes}:${seconds}` === "9:35") {
+        if (`${minutes}:${seconds}` === "6:35") {
           io.to(data.bidId).emit("finished", "Bid has finished");
           socket.to(data.bidId).disconnect();
         } else {
