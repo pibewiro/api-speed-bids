@@ -24,7 +24,7 @@ function socketFunctions(server) {
 
         if (`${minutes}:${seconds}` === "9:35") {
           io.to(data.bidId).emit("finished", "Bid has finished");
-          socket.to(data.bidId).disconnect();
+          // socket.to(data.bidId).disconnect();
         } else {
           io.to(data.bidId).emit("timer", `${minutes}:${seconds}`);
         }
@@ -70,9 +70,9 @@ function socketFunctions(server) {
       }
     });
 
-    socket.on("closeSocket", (data) => {
-      console.log(data);
-    });
+    // socket.on("closeSocket", (data) => {
+    //   console.log(data);
+    // });
   });
 }
 
