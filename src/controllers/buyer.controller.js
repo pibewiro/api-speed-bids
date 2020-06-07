@@ -148,14 +148,14 @@ const BuyerController = {
     buyer = await Buyer.findById(buyerId);
 
     if (entering) {
-      let time = moment().format();
-      time = time.split("T");
-      let time2 = time[1].split("-");
-      let timeEntered = `${time[0]}T${time2[0]}.000Z`;
-
+      let time = moment().format("YYYY-MM-DDThh:mm:ss.000-03:00");
+      // time = time.split("T");
+      // let time2 = time[1].split("-");
+      // let timeEntered = `${time[0]}T${time2[0]}.000Z`;
+      console.log(time);
       buyer.bidderTimestamps.push({
         bidderId: userId,
-        timeEntered,
+        timeEntered: time,
       });
       await buyer.save();
 
