@@ -23,7 +23,7 @@ const BuyerSchema = new Schema(
       type: [
         {
           bidderId: { type: Schema.Types.ObjectId, ref: "User" },
-          timeEntered: Date,
+          timeEntered: { type: Date },
         },
       ],
     },
