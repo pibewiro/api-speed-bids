@@ -6,6 +6,7 @@ const makeId = require("../../utils/makeId");
 const User = require("../models/user");
 const path = require("path");
 const Buyer = require("../models/buyer");
+const moment = require("moment");
 
 const productController = {
   async index(req, res, next) {
@@ -24,15 +25,13 @@ const productController = {
           .sort({ createdAt: -1 });
 
         total = await Product.countDocuments();
-        return res
-          .status(200)
-          .json({
-            success: true,
-            data: product,
-            total,
-            page: obj.page,
-            limit: obj.limit,
-          });
+        return res.status(200).json({
+          success: true,
+          data: product,
+          total,
+          page: obj.page,
+          limit: obj.limit,
+        });
       } else {
         product = await Product.find({ active: true })
           .populate({ path: "user", select: "firstname lastname username" })
@@ -129,7 +128,6 @@ const productController = {
             productImagesFile[i].mv(`images/${name}`);
           }
         } else {
-          console.log(req.files);
           if (!req.files.productImages.mimetype.startsWith("image")) {
             errors.images = "Invalid image";
             return res.status(400).json(errors);
@@ -145,6 +143,10 @@ const productController = {
       product = await Product();
       buyer = await Buyer();
       let endDate = `${req.body.endDate}T${req.body.endTime}.000-03:00`;
+      let bidEndTime = moment(endDate)
+        .add(2, "minutes")
+        .format("YYYY-MM-DDThh:mm:ss.000-03:00");
+
       product.productName = req.body.productName;
       product.price = req.body.price;
       product.category = req.body.category;
@@ -155,10 +157,12 @@ const productController = {
       product.endDate = endDate;
       product.save();
 
-      (buyer.product = product._id),
-        (buyer.currentPrice = product.price),
-        (buyer.bidType = req.body.bidType);
+      buyer.product = product._id;
+      buyer.currentPrice = product.price;
+      buyer.bidType = req.body.bidType;
       buyer.owner = req.body.user;
+      buyer.times.startTime = endDate;
+      buyer.times.endTime = bidEndTime;
       buyer.save();
 
       return res.status(200).json({ success: true, data: product });
@@ -186,13 +190,11 @@ const productController = {
       product.description = req.body.description;
       product.save();
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          msg: "Product Successfully Updated",
-          data: product,
-        });
+      return res.status(200).json({
+        success: true,
+        msg: "Product Successfully Updated",
+        data: product,
+      });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });

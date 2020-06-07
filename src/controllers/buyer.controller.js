@@ -1,4 +1,5 @@
 const Buyer = require("../models/buyer");
+const moment = require("moment");
 
 const BuyerController = {
   async index(req, res, next) {
@@ -135,6 +136,41 @@ const BuyerController = {
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
+    }
+  },
+
+  async bidderTimestamp(req, res, next) {
+    const { buyerId } = req.params;
+    const userId = res.locals.id;
+    const { entering } = req.body;
+
+    let buyer;
+    buyer = await Buyer.findById(buyerId);
+
+    if (entering) {
+      let time = moment().format();
+      time = time.split("T");
+      let time2 = time[1].split("-");
+      let timeEntered = `${time[0]}T${time2[0]}.000Z`;
+
+      buyer.bidderTimestamps.push({
+        bidderId: userId,
+        timeEntered,
+      });
+      await buyer.save();
+
+      let bidderData = await Buyer.findById(buyerId);
+
+      let userData = bidderData.bidderTimestamps.filter(
+        (res) => res.bidderId == userId
+      );
+      return res.status(200).json({ data: userData[0] });
+    } else {
+      let arr = buyer.bidderTimestamps.filter((res) => res.bidderId != userId);
+      buyer.bidderTimestamps = arr;
+      await buyer.save();
+
+      return res.status(200).json({ data: "User has left the bid" });
     }
   },
 };

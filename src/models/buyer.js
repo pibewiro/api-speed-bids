@@ -18,6 +18,15 @@ const BuyerSchema = new Schema(
     bidType: { type: String, enum: ["Standard", "Live"] },
     liveBidders: { type: [String] },
     liveStatus: { type: Boolean, default: false },
+    times: { startTime: { type: Date }, endTime: { type: Date } },
+    bidderTimestamps: {
+      type: [
+        {
+          bidderId: { type: Schema.Types.ObjectId, ref: "User" },
+          timeEntered: Date,
+        },
+      ],
+    },
   },
   { timestamps: true }
 );

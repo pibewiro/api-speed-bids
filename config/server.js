@@ -7,7 +7,6 @@ const routes = require("../src/routes");
 const connectDB = require("./database");
 const runBot = require("../helpers/bot");
 const env = process.env.NODE_ENV;
-
 class App {
   constructor() {
     this.server = express();
@@ -15,7 +14,7 @@ class App {
     this.routes();
     this.database();
 
-    if (env) {
+    if (!env) {
       this.bot();
     }
   }
