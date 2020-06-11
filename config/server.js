@@ -14,9 +14,11 @@ class App {
     this.routes();
     this.database();
 
-    if (!env) {
-      this.bot();
-    }
+    // if (!env) {
+    //   this.bot();
+    // }
+
+    this.bot;
   }
 
   middlewares() {
