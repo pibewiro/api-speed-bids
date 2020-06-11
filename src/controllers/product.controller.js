@@ -127,7 +127,6 @@ const productController = {
             productImagesFile[i].mv(`images/${name}`);
           }
         } else {
-          console.log(req.files);
           if (!req.files.productImages.mimetype.startsWith("image")) {
             errors.images = "Invalid image";
             return res.status(400).json(errors);
@@ -143,6 +142,10 @@ const productController = {
       product = await Product();
       buyer = await Buyer();
       let endDate = `${req.body.endDate}T${req.body.endTime}.000-03:00`;
+      let bidEndTime = moment(endDate)
+        .add(2, "minutes")
+        .format("YYYY-MM-DDThh:mm:ss.000-03:00");
+
       product.productName = req.body.productName;
       product.price = req.body.price;
       product.category = req.body.category;
@@ -153,10 +156,13 @@ const productController = {
       product.endDate = endDate;
       product.save();
 
-      (buyer.product = product._id),
-        (buyer.currentPrice = product.price),
-        (buyer.bidType = req.body.bidType);
+      //save buyer data
+      buyer.product = product._id;
+      buyer.currentPrice = product.price;
+      buyer.bidType = req.body.bidType;
       buyer.owner = req.body.user;
+      buyer.times.startTime = endDate;
+      buyer.times.endTime = bidEndTime;
       buyer.save();
 
       return res.status(200).json({ success: true, data: product });

@@ -18,7 +18,6 @@ const BuyerSchema = new Schema(
     bidType: { type: String, enum: ["Standard", "Live"] },
     liveBidders: { type: [String] },
     liveStatus: { type: Boolean, default: false },
-<<<<<<< HEAD
     times: { startTime: { type: Date }, endTime: { type: Date } },
     bidderTimestamps: {
       type: [
@@ -28,8 +27,6 @@ const BuyerSchema = new Schema(
         },
       ],
     },
-=======
->>>>>>> parent of 268decc... addition: live bids finsished with timer working
   },
   { timestamps: true }
 );
