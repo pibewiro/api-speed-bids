@@ -430,7 +430,7 @@ const productController = {
   async getProductsHomePage(req, res, next) {
     let product;
     try {
-      product = await Product.find().limit(8);
+      product = await Product.find().limit(4);
       return res.status(200).json({ data: product });
     } catch (err) {
       console.log(err);
