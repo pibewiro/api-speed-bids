@@ -157,6 +157,7 @@ const productController = {
       product.endDate = endDate;
       product.save();
 
+      //save buyer data
       buyer.product = product._id;
       buyer.currentPrice = product.price;
       buyer.bidType = req.body.bidType;
