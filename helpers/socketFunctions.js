@@ -13,6 +13,28 @@ function socketFunctions(server) {
         id: data.bidId,
         username: data.username,
       });
+
+      const startingMinutes = 10;
+      let time = startingMinutes * 60;
+
+      async function updateCountdown() {
+        const minutes = Math.floor(time / 60);
+        let seconds = time % 60;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        if (`${minutes}:${seconds}` === "6:35") {
+          io.to(data.bidId).emit("finished", "Bid has finished");
+          socket.to(data.bidId).disconnect();
+        } else {
+          io.to(data.bidId).emit("timer", `${minutes}:${seconds}`);
+        }
+        time--;
+      }
+
+      console.log(io.engine.clientsCount);
+      if (io.engine.clientsCount == 1) {
+        setInterval(updateCountdown, 1500);
+      }
     });
 
     socket.on("bid", async (data) => {

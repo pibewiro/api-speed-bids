@@ -1,5 +1,4 @@
 const Buyer = require("../models/buyer");
-const moment = require("moment");
 
 const BuyerController = {
   async index(req, res, next) {
@@ -138,6 +137,7 @@ const BuyerController = {
       return res.status(500).json({ error: "Falha Interna" });
     }
   },
+<<<<<<< HEAD
 
   async bidderTimestamp(req, res, next) {
     const { buyerId } = req.params;
@@ -173,6 +173,8 @@ const BuyerController = {
       return res.status(200).json({ data: "User has left the bid" });
     }
   },
+=======
+>>>>>>> parent of 268decc... addition: live bids finsished with timer working
 };
 
 module.exports = BuyerController;
