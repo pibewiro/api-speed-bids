@@ -15,7 +15,7 @@ class App {
     this.routes();
     this.database();
 
-    if (env) {
+    if (!env) {
       this.bot();
     }
   }

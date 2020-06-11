@@ -24,15 +24,13 @@ const userController = {
         user = await User.find().skip(obj.skip).limit(obj.limit);
 
         total = await User.countDocuments();
-        return res
-          .status(200)
-          .json({
-            success: true,
-            data: user,
-            total,
-            page: obj.page,
-            limit: obj.limit,
-          });
+        return res.status(200).json({
+          success: true,
+          data: user,
+          total,
+          page: obj.page,
+          limit: obj.limit,
+        });
       } else {
         user = await User.find();
         total = await User.countDocuments();
@@ -220,18 +218,18 @@ const userController = {
     let mailOptions = {
       from: process.env.AUTH_EMAIL,
       to: email,
-      subject: "Welcome to SpeedBids",
+      subject: "Welcome to SpeedBuyer",
       html: emailTemplate(firstname, lastname),
       attachments: [
         {
-          filename: "logo.png",
+          filename: "logo.jpg",
           path: path.join(
             __dirname,
             "../",
             "../",
             "utils",
             "emailTemplates",
-            "logo.png"
+            "logo.jpg"
           ),
           cid: "unique@kreata.ee", //same cid value as in the html img src
         },
