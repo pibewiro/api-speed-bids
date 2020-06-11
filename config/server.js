@@ -13,12 +13,10 @@ class App {
     this.middlewares();
     this.routes();
     this.database();
-
+    this.bot();
     // if (!env) {
     //   this.bot();
     // }
-
-    this.bot;
   }
 
   middlewares() {
