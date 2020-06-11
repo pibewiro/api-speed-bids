@@ -8,6 +8,7 @@ const Favorite = require("../src/models/favorites");
 const Jwt = require("../src/models/Jwt");
 const Product = require("../src/models/product");
 const Purchase = require("../src/models/purchase");
+const Follow = require("../src/models/follow");
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -24,6 +25,7 @@ async function deleteData() {
     await Jwt.deleteMany();
     await Product.deleteMany();
     await Purchase.deleteMany();
+    await Follow.deleteMany();
 
     console.log("Data Destroyed");
     process.exit();

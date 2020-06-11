@@ -128,10 +128,11 @@ const BuyerController = {
     let buyer;
 
     try {
-      buyer = await Buyer.find({ liveBidders: { $in: userId }, active: true })
-        .populate({ path: "product" })
+      buyer = await Buyer.find({ active: true })
+        .populate("product")
         .populate({ path: "owner", select: "username" })
         .sort({ liveStatus: -1 });
+      console.log(buyer);
       return res.status(200).json({ data: buyer });
     } catch (err) {
       console.log(err);
