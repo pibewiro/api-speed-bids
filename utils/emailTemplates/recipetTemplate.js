@@ -49,7 +49,7 @@ function recieptTemplate(data) {
     <div>
       <h1>Purchase Reciept</h1>
       <div class="img-div">
-        <img src="logo.png" alt="">
+        <img src="logo.jpg" alt="">
       </div>
       <div class="product-info">
         <p><span>Product Code:</span> #${data.id}</p>
@@ -67,6 +67,5 @@ function recieptTemplate(data) {
   `;
   return template;
 }
-
 
 module.exports = recieptTemplate;
