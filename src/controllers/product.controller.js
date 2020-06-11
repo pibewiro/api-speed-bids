@@ -426,6 +426,17 @@ const productController = {
       return res.status(500).json({ error: "falha interna" });
     }
   },
+
+  async getProductsHomePage(req, res, next) {
+    let product;
+    try {
+      product = await Product.find().limit(8);
+      return res.status(200).json({ data: product });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error });
+    }
+  },
 };
 
 module.exports = productController;
