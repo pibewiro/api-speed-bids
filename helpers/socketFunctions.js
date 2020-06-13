@@ -1,10 +1,25 @@
 const socket = require("socket.io");
 const Buyer = require("../src/models/buyer");
+const Message = require("../src/models/message");
 function socketFunctions(server) {
   const io = socket(server);
 
   io.on("connection", (socket) => {
-    console.log("Connected to Socket");
+    // console.log("Connected to Socket");
+
+    socket.on("register", (data) => {
+      socket.on("private_chat", async (data) => {
+        const receiverId = data.receiver.id;
+        const senderId = data.sender.id;
+        let saveMessage = new Message();
+        saveMessage.receiver = receiverId;
+        saveMessage.sender = senderId;
+        saveMessage.text = data.message;
+
+        await saveMessage.save();
+        io.emit("message-sent", saveMessage);
+      });
+    });
 
     socket.on("loggedIn", async (data) => {
       socket.join(data.bidId);

@@ -47,18 +47,16 @@ const authController = {
         { token, lastLogin: Date.now() }
       );
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          user: {
-            token,
-            userId: user._id,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            username: user.username,
-          },
-        });
+      return res.status(200).json({
+        success: true,
+        user: {
+          token,
+          userId: user._id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          username: user.username,
+        },
+      });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "falha internal" });
@@ -179,6 +177,10 @@ const authController = {
         res.status(200).json({ msg: "Message Sent" });
       }
     });
+  },
+
+  async loginAdmin(req, res, next) {
+    console.log(req);
   },
 };
 
