@@ -31,6 +31,17 @@ const userController = {
           page: obj.page,
           limit: obj.limit,
         });
+      } else if (req.query.filter) {
+        user = await User.find({
+          $or: [
+            { username: { $regex: ".*" + req.query.filter + ".*" } },
+            { firstname: { $regex: ".*" + req.query.filter + ".*" } },
+            { lastname: { $regex: ".*" + req.query.filter + ".*" } },
+            { email: { $regex: ".*" + req.query.filter + ".*" } },
+            { cpf: { $regex: ".*" + req.query.filter + ".*" } },
+          ],
+        });
+        return res.status(200).json({ success: true, data: user, total });
       } else {
         user = await User.find();
         total = await User.countDocuments();

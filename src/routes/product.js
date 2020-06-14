@@ -3,9 +3,15 @@ const productController = require("../controllers/product.controller");
 const auth = require("../../middlewares/verifyToken");
 
 router.get("/product", productController.index);
+router.get(
+  "/product/getProductsAdmin",
+  auth,
+  productController.getProductsAdmin
+);
 router.get("/product/filter", productController.filterProducts);
 router.get("/product/home-page", productController.getProductsHomePage);
 router.get("/product/:id", productController.get);
+
 router.post("/product", auth, productController.store);
 router.put("/product/:id", auth, productController.update);
 router.delete("/product/:productName/:id", auth, productController.delete);
@@ -22,5 +28,10 @@ router.put(
   productController.updateDefaulImage
 );
 router.put("/product/addImages/:id", auth, productController.addProductImages);
+router.get(
+  "/product/getProductsAdmin",
+  auth,
+  productController.getProductsAdmin
+);
 
 module.exports = router;

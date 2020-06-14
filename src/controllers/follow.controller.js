@@ -53,11 +53,23 @@ const followController = {
 
       for (let i = 0; i < followers.length; i++) {
         user = await User.findById(followers[i]);
-        followersData.push({
-          _id: user._id,
-          username: user.username,
-          image: user.image,
-        });
+
+        if (req.query.filter) {
+          let re = new RegExp(req.query.filter, "g");
+          if (re.test(user.username)) {
+            followersData.push({
+              _id: user._id,
+              username: user.username,
+              image: user.image,
+            });
+          }
+        } else {
+          followersData.push({
+            _id: user._id,
+            username: user.username,
+            image: user.image,
+          });
+        }
       }
 
       return res.status(200).json({ data: followersData });

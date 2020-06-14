@@ -257,6 +257,7 @@ const productController = {
       const product = await Product.find({
         _id: { $ne: id },
         category,
+        active: true,
       }).populate({ path: "user", select: "username" });
       return res.status(200).json({ succes: true, data: product });
     } catch (err) {
@@ -439,6 +440,30 @@ const productController = {
     } catch (err) {
       console.log(err);
       return res.status(200).json({ error: data });
+    }
+  },
+
+  async getProductsAdmin(req, res, next) {
+    try {
+      const { productFilter } = req.query;
+      let product;
+      if (productFilter) {
+        product = await Product.find({
+          productName: { $regex: ".*" + productFilter + ".*" },
+        }).populate({
+          path: "user",
+          select: "username firstname lastname email",
+        });
+      } else {
+        product = await Product.find().populate({
+          path: "user",
+          select: "username firstname lastname email",
+        });
+      }
+      return res.status(200).json({ data: product });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Falha Interna" });
     }
   },
 };
