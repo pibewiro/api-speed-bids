@@ -24,7 +24,6 @@ const purchaseController = {
   },
 
   async updateStatus(req, res, next) {
-    console.log(req.params);
     const { purchaseId } = req.params;
 
     try {
@@ -39,7 +38,6 @@ const purchaseController = {
   },
 
   async checkout(req, res, next) {
-    console.log(req.headers.origin);
     const { purchaseId } = req.params;
     let purchase;
     let sessionData = {};
@@ -120,6 +118,11 @@ const purchaseController = {
 
     try {
       buyer = await Buyer.findById(buyerId);
+      let lengthBidders = buyer.prices.length;
+      let bonusPercent = lengthBidders * 0.03;
+      let bonusPriceBidders = buyer.currentPrice * bonusPercent;
+      let bonusPrice = buyer.currentPrice * 0.05;
+      bonusPrice = bonusPrice + bonusPriceBidders;
 
       purchase = new Purchase();
       purchase.user = buyer.winner;
@@ -127,9 +130,10 @@ const purchaseController = {
       purchase.product = buyer.product;
       purchase.buyer = buyerId;
       purchase.status = "Pending";
+      purchase.bonus = bonusPrice;
       purchase.price = buyer.currentPrice;
-
       await purchase.save();
+
       buyer.liveStatus = false;
       buyer.active = false;
       buyer.save();

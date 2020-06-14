@@ -132,7 +132,6 @@ const BuyerController = {
         .populate("product")
         .populate({ path: "owner", select: "username" })
         .sort({ liveStatus: -1 });
-      console.log(buyer);
       return res.status(200).json({ data: buyer });
     } catch (err) {
       console.log(err);
@@ -150,10 +149,6 @@ const BuyerController = {
 
     if (entering) {
       let time = moment().format("YYYY-MM-DDThh:mm:ss.000-03:00");
-      // time = time.split("T");
-      // let time2 = time[1].split("-");
-      // let timeEntered = `${time[0]}T${time2[0]}.000Z`;
-      console.log(time);
       buyer.bidderTimestamps.push({
         bidderId: userId,
         timeEntered: time,

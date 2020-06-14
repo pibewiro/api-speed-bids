@@ -1,13 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const PurchaseSchema = new Schema({
-  user: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
-  owner: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
-  product: { type: mongoose.Schema.ObjectId, ref: "Product", required: true },
-  buyer: { type: mongoose.Schema.ObjectId, ref: 'Buyer', required: true },
-  status: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
-  price: { type: Number },
-}, { timestamps: true });
+const PurchaseSchema = new Schema(
+  {
+    user: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
+    owner: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
+    product: { type: mongoose.Schema.ObjectId, ref: "Product", required: true },
+    buyer: { type: mongoose.Schema.ObjectId, ref: "Buyer", required: true },
+    status: { type: String, enum: ["Pending", "Paid"], default: "Pending" },
+    price: { type: Number },
+    bonus: { type: Number },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Purchase', PurchaseSchema);
+module.exports = mongoose.model("Purchase", PurchaseSchema);

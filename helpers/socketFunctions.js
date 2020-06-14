@@ -51,10 +51,21 @@ function socketFunctions(server) {
           console.log(err);
         }
       } else {
-        await Buyer.updateOne(
-          { _id: data.bidId },
-          { currentPrice: data.price, winner: data.userId }
-        );
+        let buyer;
+        // await Buyer.updateOne(
+        //   { _id: data.bidId },
+        //   { currentPrice: data.price, winner: data.userId }
+        // );
+
+        buyer = await Buyer.findById(data.bidId);
+        buyer.currentPrice = data.price;
+        buyer.winner = data.userId;
+        buyer.prices.push({
+          buyerId: data.userId,
+          price: data.price,
+        });
+        await buyer.save();
+
         io.to(data.bidId).emit("bid2", {
           info: data.price,
           userId: data.userId,
