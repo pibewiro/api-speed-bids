@@ -14,6 +14,11 @@ router.get("/product/:id", productController.get);
 
 router.post("/product", auth, productController.store);
 router.put("/product/:id", auth, productController.update);
+router.put(
+  "/product/admin-status/:productId",
+  auth,
+  productController.productStatus
+);
 router.delete("/product/:productName/:id", auth, productController.delete);
 router.get("/product/my-products/:id", auth, productController.getMyProducts);
 router.get("/product/:category/:id", productController.getSimilarProducts);

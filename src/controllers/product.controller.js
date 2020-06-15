@@ -85,7 +85,10 @@ const productController = {
         return res.status(400).json(errors);
       }
 
-      if (req.files.productImages && !req.files.defaultImage) {
+      if (
+        (req.files.productImages && !req.files.defaultImage) ||
+        req.files.defaultImage.name === "null"
+      ) {
         errors.images = "Please add a default image";
         return res.status(400).json(errors);
       }
@@ -449,7 +452,10 @@ const productController = {
       let product;
       if (productFilter) {
         product = await Product.find({
-          productName: { $regex: ".*" + productFilter + ".*" },
+          $or: [
+            { productName: { $regex: ".*" + productFilter + ".*" } },
+            { category: { $regex: ".*" + productFilter + ".*" } },
+          ],
         }).populate({
           path: "user",
           select: "username firstname lastname email",
@@ -462,6 +468,27 @@ const productController = {
       }
       return res.status(200).json({ data: product });
     } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Falha Interna" });
+    }
+  },
+
+  async productStatus(req, res, next) {
+    console.log(req.body);
+    console.log(req.params);
+    const { active } = req.body;
+    const { productId } = req.params;
+    let product;
+
+    try {
+      if (active == true) {
+        await Product.update({ _id: productId }, { active: false });
+      } else {
+        await Product.update({ _id: productId }, { active: true });
+      }
+
+      return res.status(200).json({ data: "Product Status Upgraded" });
+    } catch (error) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
     }

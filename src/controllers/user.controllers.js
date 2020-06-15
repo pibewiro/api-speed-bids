@@ -257,6 +257,28 @@ const userController = {
       }
     });
   },
+
+  async adminUserStatus(req, res, next) {
+    const { userId } = req.params;
+    const { status } = req.query;
+    let user;
+
+    try {
+      user = await User.findById(userId);
+      if (status == "true") {
+        user.active = false;
+        user.save();
+      } else {
+        user.active = true;
+        user.save();
+      }
+
+      return res.status(200).json({ data: user });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Falha Interna" });
+    }
+  },
 };
 
 module.exports = userController;

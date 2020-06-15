@@ -130,7 +130,7 @@ const purchaseController = {
       purchase.product = buyer.product;
       purchase.buyer = buyerId;
       purchase.status = "Pending";
-      purchase.bonus = bonusPrice;
+      purchase.bonus = bonusPrice.toFixed(2);
       purchase.price = buyer.currentPrice;
       await purchase.save();
 
@@ -147,6 +147,42 @@ const purchaseController = {
     } catch (err) {
       console.log(err);
       return res.status(500).json({ Error: "Falha Interna" });
+    }
+  },
+
+  async getUserPurchaseData(req, res, next) {
+    const { userId } = req.params;
+    let purchase;
+
+    try {
+      purchase = await Purchase.find({
+        owner: userId,
+        status: "Paid",
+      });
+
+      let itemsSold = purchase.length;
+      let totalPrice = 0;
+      let totalBonus = 0;
+      let purchaseData;
+
+      purchase.map((res) => {
+        totalPrice = totalPrice + res.price;
+
+        if (res.bonus) {
+          totalBonus = totalBonus + res.bonus;
+        }
+      });
+
+      purchaseData = {
+        totalPrice,
+        totalBonus,
+        itemsSold,
+      };
+
+      return res.status(200).json({ data: purchaseData });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Falha Interna" });
     }
   },
 };
