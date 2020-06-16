@@ -24,7 +24,14 @@ async function checkProducts() {
       res.active = false;
       await res.save();
       if (res.prices.length != 0) {
+        let lengthBidders = res.prices.length;
+        let bonusPercent = lengthBidders * 0.03;
+        let bonusPriceBidders = res.currentPrice * bonusPercent;
+        let bonusPrice = res.currentPrice * 0.05;
+        bonusPrice = bonusPrice + bonusPriceBidders;
+
         purchase = await Purchase();
+        purchase.bonus = bonusPrice.toFixed(2);
         purchase.user = res.winner;
         purchase.owner = res.product.user;
         purchase.product = res.product._id;

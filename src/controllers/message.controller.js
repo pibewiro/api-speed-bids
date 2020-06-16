@@ -1,7 +1,9 @@
 const Message = require("../models/message");
+const Follow = require("../models/follow");
 const nodeMailer = require("nodemailer");
 const adminTemplate = require("../../utils/emailTemplates/TemplateAdmin");
 const path = require("path");
+const follow = require("../models/follow");
 
 const messageController = {
   async get(req, res, next) {
@@ -66,6 +68,29 @@ const messageController = {
     });
 
     return res.status(200).json({ data: "Mensagem enviada com sucesso" });
+  },
+
+  async myMessages(req, res, next) {
+    const { userId } = req.params;
+    let message, follow;
+    let senders = [];
+
+    try {
+      follow = await Follow.findOne({ user: userId });
+      let followers = follow.follows;
+      for (follower of followers) {
+        message = await Message.findOne({ sender: follower }).populate({
+          path: "sender",
+          select: "username",
+        });
+        senders.push(message);
+      }
+
+      return res.status(200).json({ data: senders });
+    } catch (err) {
+      console.log(err);
+      return res.status(200).json({ error: "Falha Interna" });
+    }
   },
 };
 

@@ -436,9 +436,7 @@ const productController = {
     let product;
 
     try {
-      product = await Product.find({ active: true })
-        .limit(4)
-        .sort({ createdAt: -1 });
+      product = await Product.find().limit(8).sort({ createdAt: -1 });
       return res.status(200).json({ data: product });
     } catch (err) {
       console.log(err);
