@@ -35,8 +35,14 @@ const messageController = {
       errors.message = "A mensagem é obrigatória";
     }
     let transporter = nodeMailer.createTransport({
-      service: process.env.AUTH_SERVICE,
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: { user: process.env.AUTH_EMAIL, pass: process.env.AUTH_PASS },
+      tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false,
+      },
     });
 
     let mailOptions = {
