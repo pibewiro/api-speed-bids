@@ -27,11 +27,7 @@ const messageController = {
   async sendMessageAdmin(req, res, next) {
     // console.log(req.params);
     // console.log(req.body);
-    console.log(
-      process.env.AUTH_EMAIL,
-      process.env.AUTH_SERVICE,
-      process.env.AUTH_PASS
-    );
+
     const { firstname, lastname, email, message } = req.body;
 
     if (!message) {
