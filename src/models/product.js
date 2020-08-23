@@ -11,6 +11,7 @@ const productSchema = Schema(
     image: { defaultImage: { type: String }, productImages: [String] },
     endDate: { type: Date },
     active: { type: Boolean, default: true },
+    purchaseId: { type: String, ref: "Purchase" }
   },
   { timestamps: true }
 );

@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const Purchase = require("../models/purchase");
 const auth = require("../../middlewares/verifyToken");
 const validateProduct = require("../../utils/validations/validateProduct");
 const skipFunction = require("../../utils/skipFunction");
@@ -243,9 +244,12 @@ const productController = {
     // if (res.locals.id !== req.params.id) return res.status(401).json({ error: 'Unauthorized' })
 
     try {
-      const product = await Product.find({ user: userId }).sort({
-        createdAt: "desc",
-      });
+      const product = await Product.find({ user: userId })
+        .populate({ path: 'purchaseId', select: 'bonus price tax status priceTaxedBonus datePaid' })
+        .sort({
+          createdAt: "desc",
+        });
+
       return res.status(200).json({ succes: true, data: product });
     } catch (err) {
       console.log(err);

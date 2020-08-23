@@ -48,7 +48,8 @@ const followController = {
     let user, follow;
     try {
       follow = await Follow.findOne({ user: userId });
-      let followers = follow.follows;
+
+      let followers = follow ? follow.follows : [];
       let followersData = [];
 
       for (let i = 0; i < followers.length; i++) {

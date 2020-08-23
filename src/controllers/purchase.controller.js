@@ -1,4 +1,5 @@
 const Purchase = require("../models/purchase");
+const Product = require("../models/product");
 const Buyer = require("../models/buyer");
 const pdf = require("html-pdf");
 const path = require("path");
@@ -27,7 +28,7 @@ const purchaseController = {
     const { purchaseId } = req.params;
 
     try {
-      await Purchase.updateOne({ _id: purchaseId }, { status: "Paid" });
+      await Purchase.updateOne({ _id: purchaseId }, { status: "Paid", datePaid: new Date() });
       return res
         .status(200)
         .json({ data: "Product has successfully been paid" });
@@ -54,7 +55,7 @@ const purchaseController = {
           {
             amount: purchase.price * 100,
             quantity: 1,
-            currency: "usd",
+            currency: "brl",
             name: purchase.product.productName,
             description: "Speed Buyer",
           },
@@ -98,7 +99,7 @@ const purchaseController = {
         lastname: purchase.owner.lastname,
       },
       price: purchase.price,
-      date: moment(purchase.createdAt).format("DD/MM/YYYY"),
+      date: moment(purchase.datePaid).format("DD/MM/YYYY"),
     };
 
     let imgPath = path.join(__dirname + "../../../utils/emailTemplates/");
@@ -114,7 +115,7 @@ const purchaseController = {
 
   async updateLive(req, res, next) {
     const { buyerId } = req.body;
-    let buyer, purchase;
+    let buyer, purchase, tax, priceTaxedBonus, product;
 
     try {
       buyer = await Buyer.findById(buyerId);
@@ -132,11 +133,17 @@ const purchaseController = {
       purchase.status = "Pending";
       purchase.bonus = bonusPrice.toFixed(2);
       purchase.price = buyer.currentPrice;
+
+      tax = purchase.price * 0.05;
+      purchase.tax = tax.toFixed(2);
+      priceTaxedBonus = (purchase.price + purchase.bonus) - purchase.tax;
+      purchase.priceTaxedBonus = priceTaxedBonus.toFixed(2);
       await purchase.save();
 
       buyer.liveStatus = false;
       buyer.active = false;
-      buyer.save();
+      await buyer.save();
+      await Product.updateOne({ _id: purchase.product }, { purchaseId: purchase._id });
 
       let purchaseData = await Purchase.findById(purchase._id)
         .populate({ path: "user", select: "firstname lastname username" })

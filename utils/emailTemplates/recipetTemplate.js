@@ -57,7 +57,7 @@ function recieptTemplate(data) {
         <p><span>Price:</span> R$${data.price}</p>
         <p><span>Sold By:</span> ${data.owner.firstname} ${data.owner.lastname}</p>
         <p><span>Sold To:</span> ${data.user.firstname} ${data.user.lastname}</p>
-        <p><span>Date:</span> ${data.date}</p>
+        <p><span>Purchase Date:</span> ${data.date}</p>
       </div>
   
     </div>
