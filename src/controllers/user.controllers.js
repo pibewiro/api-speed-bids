@@ -227,7 +227,7 @@ const userController = {
     });
 
     let mailOptions = {
-      from: process.env.AUTH_EMAIL,
+      from: `Speed Buyer <${process.env.AUTH_EMAIL}>`,
       to: email,
       subject: "Welcome to SpeedBuyer",
       html: emailTemplate(firstname, lastname),

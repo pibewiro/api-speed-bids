@@ -73,6 +73,29 @@ const messageController = {
 
     return res.status(200).json({ data: "Mensagem enviada com sucesso" });
   },
+
+  async getMyMessages(req, res, next) {
+    const { userId } = req.params;
+    let messages, index;
+    let senders = []
+
+    messages = await Message.find({ receiver: userId })
+      .sort({ updatedAt: 'desc' })
+      .populate({ path: 'sender', select: 'username updatedAt' })
+
+
+    for (let i = 0; i < messages.length; i++) {
+      index = senders.findIndex(sender => sender.username === messages[i].sender.username && sender.id === messages[i].sender._id);
+      if (index === -1) {
+        senders.push({
+          id: messages[i].sender._id,
+          username: messages[i].sender.username
+        })
+      }
+    }
+
+    return res.status(200).json({ data: senders })
+  }
 };
 
 module.exports = messageController;

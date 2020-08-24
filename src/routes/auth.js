@@ -13,5 +13,6 @@ router.get(
   auth,
   authController.emailDeletedUser
 );
+router.get("/auth/recover-password/:email", authController.recoverPassword)
 
 module.exports = router;

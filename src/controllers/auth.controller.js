@@ -7,7 +7,10 @@ const generateToken = require("../../utils/generateToken");
 const validateLogin = require("../../utils/validations/validateLogin");
 const nodemailer = require("nodemailer");
 const deleteProfileEmail = require("../../utils/emailTemplates/TemplateDeleteUser");
+const templateRecoverPassword = require("../../utils/emailTemplates/TemplateRecoverPassword");
 const path = require("path");
+const makeId = require('../../utils/makeId');
+const hashPassword = require('../../utils/hashPassword');
 require("dotenv").config();
 
 const authController = {
@@ -142,7 +145,7 @@ const authController = {
 
   async emailDeletedUser(req, res, next) {
     const { firstname, lastname, email } = req.params;
-    console;
+
     let transporter = nodemailer.createTransport({
       service: process.env.AUTH_SERVICE,
       auth: { user: process.env.AUTH_EMAIL, pass: process.env.AUTH_PASS },
@@ -234,6 +237,62 @@ const authController = {
       return res.status(500).json({ error: "falha internal" });
     }
   },
+
+  async recoverPassword(req, res) {
+    const { email } = req.params;
+    let user, newPassword;
+
+    if (email === 'null') {
+      return res.status(400).json({ error: 'Por favor digite um email' })
+    }
+
+    user = await User.findOne({ email }).select('+password');
+    console.log(user)
+
+    if (!user) {
+      return res.status(400).json({ error: 'User does not exist' })
+    }
+
+    newPassword = makeId(6);
+
+    let hashedPassword = await hashPassword(newPassword);
+    await User.updateOne({ email }, { password: hashedPassword });
+
+    let transporter = nodemailer.createTransport({
+      service: process.env.AUTH_SERVICE,
+      auth: { user: process.env.AUTH_EMAIL, pass: process.env.AUTH_PASS },
+    });
+
+    let mailOptions = {
+      from: `Speed Buyer <${process.env.AUTH_EMAIL}>`,
+      to: email,
+      subject: "Password Recovery",
+      html: templateRecoverPassword(user.firstname, user.lastname, newPassword),
+      attachments: [
+        {
+          filename: "logo.jpg",
+          path: path.join(
+            __dirname,
+            "../",
+            "../",
+            "utils",
+            "emailTemplates",
+            "logo.jpg"
+          ),
+          cid: "unique@kreata.ee", //same cid value as in the html img src
+        },
+      ],
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(info);
+        return res.status(200).json({ msg: "Message Sent", success: true });
+      }
+    });
+  }
 };
 
 module.exports = authController;

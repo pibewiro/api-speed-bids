@@ -46,11 +46,7 @@ function regEmail(firstname, lastname) {
       <a href="http://localhost:8080">Speedbids</a>
     </div>
   </body>
-  
   </html>
-  
-  
-  
   `;
 
   return email;
