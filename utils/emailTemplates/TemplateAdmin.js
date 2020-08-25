@@ -39,7 +39,7 @@ function regEmail(firstname, lastname, message) {
     
     <body>
       <div>
-        <h1>Welcome To SpeedBids</h1>
+        <h1>Speed Buyer</h1>
         <img src="cid:unique@kreata.ee"/>      
         <p>Oi ${firstname} ${lastname}</p>
         <p>${message}</p>

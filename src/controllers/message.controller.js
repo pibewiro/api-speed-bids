@@ -25,9 +25,6 @@ const messageController = {
   },
 
   async sendMessageAdmin(req, res, next) {
-    // console.log(req.params);
-    // console.log(req.body);
-
     const { firstname, lastname, email, message } = req.body;
 
     if (!message) {

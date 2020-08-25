@@ -6,6 +6,7 @@ const path = require("path");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const moment = require("moment");
 const recieptTemplate = require("../../utils/emailTemplates/recipetTemplate");
+const { bidderTimestamp } = require("./buyer.controller");
 
 const purchaseController = {
   async index(req, res, next) {
@@ -31,7 +32,7 @@ const purchaseController = {
       await Purchase.updateOne({ _id: purchaseId }, { status: "Paid", datePaid: new Date() });
       return res
         .status(200)
-        .json({ data: "Product has successfully been paid" });
+        .json({ data: "O produto foi pago com sucesso" });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
@@ -115,11 +116,21 @@ const purchaseController = {
 
   async updateLive(req, res, next) {
     const { buyerId } = req.body;
-    let buyer, purchase, tax, priceTaxedBonus, product;
+    let buyer, purchase, tax, priceTaxedBonus, check;
+    let bidders = [];
 
     try {
       buyer = await Buyer.findById(buyerId);
-      let lengthBidders = buyer.prices.length;
+
+      buyer.prices.map(price => {
+        check = bidders.includes(price.buyerId)
+
+        if (check === false) {
+          bidders.push(price.buyerId);
+        }
+      })
+
+      let lengthBidders = bidders.length;
       let bonusPercent = lengthBidders * 0.03;
       let bonusPriceBidders = buyer.currentPrice * bonusPercent;
       let bonusPrice = buyer.currentPrice * 0.05;

@@ -56,7 +56,7 @@ const BuyerController = {
     validateNum = /^\d*$/g;
     checkNumber = validateNum.test(price);
     if (!checkNumber || !price) {
-      error.price = "A number is required";
+      error.price = "É necessário um número";
       return res.status(400).json(error);
     }
 
@@ -68,7 +68,7 @@ const BuyerController = {
 
       if (buyer.prices.length === 0) {
         if (buyer.currentPrice >= price) {
-          error.price = "Price Must be higher than the current bid";
+          error.price = "O preço deve ser maior do que o lance atual";
           return res.status(400).json(error);
         }
       }
@@ -82,18 +82,24 @@ const BuyerController = {
       });
 
       if (check.includes(true)) {
-        error.price = "Price Must be higher than the current bid";
+        error.price = "O preço deve ser maior do que o lance atual";
         return res.status(400).json(error);
+      }
+
+      if (buyer.prices[buyer.prices.length - 1].buyerId._id.toString() === userId) {
+        error.price = "Você precisa esperar que outra pessoa faça um lance";
+        return res.status(400).json(error)
       }
 
       buyer.prices.push({ buyerId: userId, price, dateAdded: new Date() });
       buyer.currentPrice = price;
       buyer.winner = userId;
+
       await buyer.save();
 
       return res
         .status(200)
-        .json({ data: `Price has been updated to R$${price}` });
+        .json({ data: `O preço foi atualizado para R$${price}` });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
@@ -110,13 +116,13 @@ const BuyerController = {
       const checkUser = buyer.liveBidders.includes(userId);
 
       if (checkUser) {
-        error.liveBidder = "You have already joined this bidding Session";
+        error.liveBidder = "Você já entrou nesta sessão de licitação";
         return res.status(400).json(error);
       }
 
       buyer.liveBidders.push(userId);
       buyer.save();
-      return res.status(200).json("Buyer Added");
+      return res.status(200).json("Comprador Adicionado");
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
@@ -166,7 +172,7 @@ const BuyerController = {
       buyer.bidderTimestamps = arr;
       await buyer.save();
 
-      return res.status(200).json({ data: "User has left the bid" });
+      return res.status(200).json({ data: "O usuário saiu do lance" });
     }
   },
 };

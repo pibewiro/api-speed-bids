@@ -39,12 +39,12 @@ function recoverPassword(firstname, lastname, newPassword) {
     
     <body>
       <div>
-        <h1>Welcome To SpeedBuyer</h1>
+        <h1>Speed Buyer</h1>
         <img src="cid:unique@kreata.ee"/>      
-        <p>Thanks, ${firstname} ${lastname}</p>
-        <p>Your new password is: ${newPassword}</p>
-        <p>Please, login and go to your profile settings to create a new password</p>
-        <a href="http://localhost:8080">SpeedBuyer</a>
+        <p>Sr./Sra., ${firstname} ${lastname}</p>
+        <p>Sua nova senha é: ${newPassword}</p>
+        <p>Por favor, faça o login e vá para as configurações do seu perfil para criar uma nova senha</p>
+        <a href="http://localhost:8080">Speed Buyer</a>
       </div>
     </body>
     

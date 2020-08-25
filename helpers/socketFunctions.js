@@ -24,7 +24,7 @@ function socketFunctions(server) {
     socket.on("loggedIn", async (data) => {
       socket.join(data.bidId);
       socket.broadcast.to(data.bidId).emit("logInMessage", {
-        info: `has joined the live bid ${data.bidId}`,
+        info: `entrou no lance live ${data.bidId}`,
         id: data.bidId,
         username: data.username,
       });
@@ -37,7 +37,7 @@ function socketFunctions(server) {
       if (data.price <= buyer.currentPrice) {
         try {
           io.to(socket.id).emit("error", {
-            error: "Price must be higher than current bid",
+            error: "O preço deve ser superior ao lance atual",
           });
         } catch (err) {
           console.log(err);
@@ -45,7 +45,7 @@ function socketFunctions(server) {
       } else if (data.userId == buyer.winner) {
         try {
           io.to(socket.id).emit("error", {
-            error: "You must wait for another bidder",
+            error: "Você deve esperar por outro licitante",
           });
         } catch (err) {
           console.log(err);

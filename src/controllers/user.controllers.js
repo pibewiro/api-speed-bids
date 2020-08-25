@@ -68,15 +68,15 @@ const userController = {
         });
         if (user) {
           if (user.username === username) {
-            errors.username = "User Already Exists";
+            errors.username = "Usuário já existe";
           }
 
           if (user.email === email) {
-            errors.email = "Email Already Exists";
+            errors.email = "Email já existe";
           }
 
           if (user.cpf === cpf) {
-            errors.cpf = "CPF Already Exists";
+            errors.cpf = "CPF já existe";
           }
           console.log(errors);
           return res.status(400).json(errors);
@@ -95,7 +95,7 @@ const userController = {
 
       return res
         .status(200)
-        .json({ msg: "User Successfully Registered", data: user });
+        .json({ msg: "Usuário registrado com sucesso", data: user });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
@@ -109,7 +109,7 @@ const userController = {
     try {
       user = await User.findById(id);
 
-      if (!user) return res.status(404).json({ error: "User not found" });
+      if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
       return res.status(200).json({ success: true, data: user });
     } catch (err) {
       console.log(err);
@@ -148,15 +148,15 @@ const userController = {
           let errors = {};
 
           if (user.username === username) {
-            errors.username = "User Already Exists";
+            errors.username = "Usuário já existe";
           }
 
           if (user.email === email) {
-            errors.email = "Email Already Exists";
+            errors.email = "Email já existe";
           }
 
           if (user.cpf === cpf) {
-            errors.cpf = "CPF Already Exists";
+            errors.cpf = "CPF já existe";
           }
 
           return res.status(400).json({ errors });
@@ -166,7 +166,7 @@ const userController = {
       }
 
       let user2 = await User.findById(id);
-      if (!user2) return res.status(404).json({ error: "No user found" });
+      if (!user2) return res.status(404).json({ error: "Nenhum usuário encontrado" });
 
       if (req.files) {
         console.log(req.files);
@@ -174,7 +174,7 @@ const userController = {
           let errors = {};
           const img = req.files.userImage;
           if (!img.mimetype.startsWith("image")) {
-            errors.image = "Must be am image file";
+            errors.image = "Deve ser um arquivo de imagem";
             return res.status("400").json(errors);
           }
           const ext = path.extname(img.name).toLowerCase();
@@ -208,9 +208,9 @@ const userController = {
     try {
       user = await User.updateOne({ _id: id }, { active: false });
 
-      if (!user) return res.status(404).json({ error: "User not found" });
+      if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
 
-      return res.status(200).json({ success: true, msg: "User deleted" });
+      return res.status(200).json({ success: true, msg: "Usuário excluído" });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
@@ -229,7 +229,7 @@ const userController = {
     let mailOptions = {
       from: `Speed Buyer <${process.env.AUTH_EMAIL}>`,
       to: email,
-      subject: "Welcome to SpeedBuyer",
+      subject: "Bem-vindo ao Speed Buyer",
       html: emailTemplate(firstname, lastname),
       attachments: [
         {

@@ -8,15 +8,15 @@ function validateLogin(data) {
   data.password = isEmpty(data.password) ? '' : data.password;
 
   if (!validator.isEmail(data.email)) {
-    errors.email = 'Invalid Email';
+    errors.email = 'Email inválido';
   };
 
   if (validator.isEmpty(data.email)) {
-    errors.email = 'Field is required';
+    errors.email = 'Campo é obrigatório';
   }
 
   if (validator.isEmpty(data.password)) {
-    errors.password = 'Field is required';
+    errors.password = 'Campo é obrigatório';
   }
 
   return {

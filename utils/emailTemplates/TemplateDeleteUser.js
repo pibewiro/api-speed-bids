@@ -39,10 +39,10 @@ function deleteProfileEmail(firstname, lastname) {
   
   <body>
     <div>
-      <h1>Welcome To SpeedBuyer</h1>
+      <h1>SpeedBuyer</h1>
       <img src="cid:unique@kreata.ee"/>      
-      <p>Thanks, ${firstname} ${lastname}</p>
-      <p>For using our service</p>
+      <p>Obrigado, ${firstname} ${lastname}</p>
+      <p>Por usar nosso serviço</p>
       <a href="http://localhost:8080">SpeedBuyer</a>
     </div>
   </body>

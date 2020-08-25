@@ -36,12 +36,12 @@ const authController = {
       );
 
       if (!user)
-        return res.status(404).json({ invalid: "Invalid login details" });
+        return res.status(404).json({ invalid: "Login inválido" });
 
       const match = await bcrypt.compare(password, user.password);
 
       if (!match)
-        return res.status(400).json({ invalid: "Invalid login details" });
+        return res.status(400).json({ invalid: "Login inválido" });
 
       const token = await generateToken(user._id, user.type);
 
@@ -88,7 +88,7 @@ const authController = {
     let error = {};
 
     if (newPassword !== confirmPassword) {
-      error.password = "Passwords must match";
+      error.password = "As senhas devem corresponder";
       return res.status(400).json(error);
     }
 
@@ -96,14 +96,14 @@ const authController = {
     const compare = bcrypt.compareSync(currentPassword, user.password);
 
     if (!compare) {
-      error.currentPassword = "Invalid Password";
+      error.currentPassword = "Senha inválida";
       return res.status(400).json(error);
     }
 
     user.password = bcrypt.hashSync(newPassword);
     user.save();
 
-    return res.status(200).json({ msg: "Successively changed password" });
+    return res.status(200).json({ msg: "Senha alterada com sucesso" });
   },
 
   async deleteUser(req, res, next) {
@@ -112,7 +112,6 @@ const authController = {
     let error = {};
 
     if (!password) {
-      console.log("Password is required");
       return res.status(404).json(error);
     }
 
@@ -120,7 +119,7 @@ const authController = {
       user = await User.findById(id).select("+password");
       let compare = bcrypt.compareSync(password, user.password);
       if (!compare) {
-        error.password = "Invalid Password";
+        error.password = "Senha inválida";
         return res.status(400).json(error);
       }
 
@@ -136,7 +135,7 @@ const authController = {
       }
       user.active = false;
       user.save();
-      return res.status(200).json({ msg: "User Successivley Deleted!" });
+      return res.status(200).json({ msg: "Usuário excluído!" });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
@@ -154,7 +153,7 @@ const authController = {
     let mailOptions = {
       from: process.env.AUTH_EMAIL,
       to: email,
-      subject: "Thanks for using our service",
+      subject: "Obrigado por usar nosso serviço",
       html: deleteProfileEmail(firstname, lastname),
       attachments: [
         {
@@ -209,12 +208,12 @@ const authController = {
         return res.status(404).json(errors);
       }
       if (!user)
-        return res.status(404).json({ invalid: "Invalid login details" });
+        return res.status(404).json({ invalid: "Login inválido" });
 
       const match = await bcrypt.compare(password, user.password);
 
       if (!match)
-        return res.status(400).json({ invalid: "Invalid login details" });
+        return res.status(400).json({ invalid: "Login inválido" });
 
       const token = await generateToken(user._id, user.type);
 
@@ -250,7 +249,7 @@ const authController = {
     console.log(user)
 
     if (!user) {
-      return res.status(400).json({ error: 'User does not exist' })
+      return res.status(400).json({ error: 'Usuário não exisite' })
     }
 
     newPassword = makeId(6);
@@ -266,7 +265,7 @@ const authController = {
     let mailOptions = {
       from: `Speed Buyer <${process.env.AUTH_EMAIL}>`,
       to: email,
-      subject: "Password Recovery",
+      subject: "Recuperação de Senha",
       html: templateRecoverPassword(user.firstname, user.lastname, newPassword),
       attachments: [
         {

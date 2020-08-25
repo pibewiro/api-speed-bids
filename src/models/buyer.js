@@ -7,7 +7,7 @@ const BuyerSchema = new Schema(
     owner: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
     prices: [
       {
-        buyerId: { type: mongoose.Schema.ObjectId, ref: "User" },
+        buyerId: { type: String, ref: "User" },
         price: Number,
         dateAdded: { type: Date },
       },

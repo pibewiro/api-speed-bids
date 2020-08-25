@@ -82,7 +82,7 @@ const productController = {
       let productImages = [];
       let defaultImageFile;
       if (!req.files) {
-        errors.images = "Please select at least a default image";
+        errors.images = "Selecione pelo menos uma imagem padrão";
         return res.status(400).json(errors);
       }
 
@@ -90,14 +90,14 @@ const productController = {
         (req.files.productImages && !req.files.defaultImage) ||
         req.files.defaultImage.name === "null"
       ) {
-        errors.images = "Please add a default image";
+        errors.images = "Adicione uma imagem padrão";
         return res.status(400).json(errors);
       }
 
       if (req.files.defaultImage) {
         defaultImageFile = req.files.defaultImage;
         if (!defaultImageFile.mimetype.startsWith("image")) {
-          errors.images = "Invalid image";
+          errors.images = "Imagen inválido";
           return res.status(400).json(errors);
         }
         let ext = path.extname(defaultImageFile.name).toLowerCase();
@@ -120,7 +120,7 @@ const productController = {
           }
 
           if (exts.length > 0) {
-            errors.images = "Invalid Image";
+            errors.images = "Imagen inválido";
             return res.status(400).json(errors);
           }
 
@@ -133,7 +133,7 @@ const productController = {
           }
         } else {
           if (!req.files.productImages.mimetype.startsWith("image")) {
-            errors.images = "Invalid image";
+            errors.images = "Imagen inválido";
             return res.status(400).json(errors);
           }
           let ext = path.extname(req.files.productImages.name).toLowerCase();
@@ -197,7 +197,7 @@ const productController = {
 
       return res.status(200).json({
         success: true,
-        msg: "Product Successfully Updated",
+        msg: "Produto atualizado com sucesso",
         data: product,
       });
     } catch (err) {
@@ -225,14 +225,14 @@ const productController = {
       product2 = await Product.findById(id);
 
       if (product2.productName !== productName) {
-        error.productName = "Wrong name";
+        error.productName = "Nome Errado";
         return res.status(400).json(error);
       }
 
       product = await Product.updateOne({ _id: id }, { active: false });
       return res
         .status(200)
-        .json({ success: true, msg: "Product Successfully Deleted" });
+        .json({ success: true, msg: "Produto excluído com sucesso" });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });
@@ -280,7 +280,7 @@ const productController = {
     try {
       product = await Product.findById(id);
 
-      if (!product) return res.status(404).json({ error: "No Product found" });
+      if (!product) return res.status(404).json({ error: "Nenhum produto encontrado" });
 
       let imgs = [];
       imgs = product.image.productImages.filter((res) => res !== name);
@@ -301,7 +301,7 @@ const productController = {
     let product;
 
     if (!req.files) {
-      error.image = "Default image required";
+      error.image = "Imagem padrão necessária";
 
       return res.status(404).json(error);
     }
@@ -309,12 +309,12 @@ const productController = {
     try {
       product = await Product.findById(id);
 
-      if (!product) return res.status(404).json({ error: "No product found" });
+      if (!product) return res.status(404).json({ error: "Nenhum produto encontrado" });
 
       let imgs, img, name, ext;
 
       if (!req.files.newDefaultImage.mimetype.startsWith("image")) {
-        error.image = "Must be an image file";
+        error.image = "Deve ser um arquivo de imagem";
         return res.status(400).json(error);
       }
 
@@ -339,7 +339,7 @@ const productController = {
 
     if (!img.mimetype.startsWith("image")) {
       let error = {};
-      error.image = "Only image files";
+      error.image = "Deve ser um arquivo de imagem";
       return res.status(400).json(error);
     }
 
@@ -478,8 +478,7 @@ const productController = {
   },
 
   async productStatus(req, res, next) {
-    console.log(req.body);
-    console.log(req.params);
+
     const { active } = req.body;
     const { productId } = req.params;
     let product;
@@ -491,7 +490,7 @@ const productController = {
         await Product.update({ _id: productId }, { active: true });
       }
 
-      return res.status(200).json({ data: "Product Status Upgraded" });
+      return res.status(200).json({ data: "Status do Produto Atulaizado" });
     } catch (error) {
       console.log(err);
       return res.status(500).json({ error: "Falha Interna" });

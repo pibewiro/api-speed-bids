@@ -39,10 +39,10 @@ function regEmail(firstname, lastname) {
   
   <body>
     <div>
-      <h1>Welcome To SpeedBids</h1>
+      <h1>Bem-vindo ao Speed Buyer</h1>
       <img src="cid:unique@kreata.ee"/>      
       <p>Wecome ${firstname} ${lastname}</p>
-      <p>Your registration is confirmed enjoy new offers</p>
+      <p>Seu registro está confirmado aproveite novas ofertas</p>
       <a href="http://localhost:8080">Speedbids</a>
     </div>
   </body>
