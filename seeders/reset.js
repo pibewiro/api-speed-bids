@@ -9,6 +9,7 @@ const Jwt = require("../src/models/Jwt");
 const Product = require("../src/models/product");
 const Purchase = require("../src/models/purchase");
 const Follow = require("../src/models/follow");
+const Message = require("../src/models/message");
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -19,13 +20,14 @@ mongoose.connect(process.env.MONGO_URI, {
 
 async function deleteData() {
   try {
-    // await User.deleteMany();
+    await User.deleteMany();
     await Buyer.deleteMany();
     await Favorite.deleteMany();
     await Jwt.deleteMany();
     await Product.deleteMany();
     await Purchase.deleteMany();
     await Follow.deleteMany();
+    await Message.deleteMany();
 
     console.log("Data Destroyed");
     process.exit();

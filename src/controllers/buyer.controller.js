@@ -86,10 +86,13 @@ const BuyerController = {
         return res.status(400).json(error);
       }
 
-      if (buyer.prices[buyer.prices.length - 1].buyerId._id.toString() === userId) {
-        error.price = "Você precisa esperar que outra pessoa faça um lance";
-        return res.status(400).json(error)
+      if (buyer.prices.length > 0) {
+        if (buyer.prices[buyer.prices.length - 1].buyerId._id.toString() === userId) {
+          error.price = "Você precisa esperar que outra pessoa faça um lance";
+          return res.status(400).json(error)
+        }
       }
+
 
       buyer.prices.push({ buyerId: userId, price, dateAdded: new Date() });
       buyer.currentPrice = price;
@@ -134,7 +137,7 @@ const BuyerController = {
     let buyer;
 
     try {
-      buyer = await Buyer.find({ active: true })
+      buyer = await Buyer.find({ active: true, bidType: 'Live', liveBidders: { $in: userId } })
         .populate("product")
         .populate({ path: "owner", select: "username" })
         .sort({ liveStatus: -1 });
