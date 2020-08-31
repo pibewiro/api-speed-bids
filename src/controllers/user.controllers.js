@@ -5,6 +5,7 @@ const validateReg = require("../../utils/validations/validateRegistration");
 const jwt = require("jsonwebtoken");
 const skipFunction = require("../../utils/skipFunction");
 const nodeMailer = require("nodemailer");
+const nodemailerSendgrid = require('nodemailer-sendgrid');
 const emailTemplate = require("../../utils/emailTemplates/TemplateRegistration");
 require("dotenv").config();
 const path = require("path");
@@ -64,16 +65,16 @@ const userController = {
       try {
         const user = await User.findOne({
           active: true,
-          $or: [{ username }, { email }, { cpf }],
+          $or: [{ username }, { cpf }],
         });
         if (user) {
           if (user.username === username) {
             errors.username = "Usuário já existe";
           }
 
-          if (user.email === email) {
-            errors.email = "Email já existe";
-          }
+          // if (user.email === email) {
+          //   errors.email = "Email já existe";
+          // }
 
           if (user.cpf === cpf) {
             errors.cpf = "CPF já existe";
@@ -221,10 +222,11 @@ const userController = {
     const { email, firstname, lastname } = req.params;
     console.log(req.params);
 
-    let transporter = nodeMailer.createTransport({
-      service: process.env.AUTH_SERVICE,
-      auth: { user: process.env.AUTH_EMAIL, pass: process.env.AUTH_PASS },
-    });
+    let transporter = nodeMailer.createTransport(
+      nodemailerSendgrid({
+        apiKey: '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'
+    })
+    );
 
     let mailOptions = {
       from: `Speed Buyer <${process.env.AUTH_EMAIL}>`,
@@ -251,8 +253,7 @@ const userController = {
       if (err) {
         console.log(err);
       } else {
-        console.log("Sender:", info.envelope.from);
-        console.log("Reciever:", info.accepted[0]);
+        console.log("Email Successfully Sent");
         return res.status(200).json({ msg: "Email Successfully Sent" });
       }
     });
