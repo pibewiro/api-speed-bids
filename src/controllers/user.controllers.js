@@ -224,7 +224,7 @@ const userController = {
 
     let transporter = nodeMailer.createTransport(
       nodemailerSendgrid({
-        apiKey: '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'
+        apiKey: process.env.SENDGRID_KEY
     })
     );
 
