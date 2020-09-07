@@ -34,7 +34,7 @@ const productController = {
           limit: obj.limit,
         });
       } else {
-        product = await Product.find({ active: true })
+        product = await Product.find()
           .populate({ path: "user", select: "firstname lastname username" })
           .sort({ createdAt: -1 });
 
@@ -245,7 +245,10 @@ const productController = {
 
     try {
       const product = await Product.find({ user: userId })
-        .populate({ path: 'purchaseId', select: 'bonus price tax status priceTaxedBonus datePaid' })
+        .populate({
+          path: "purchaseId",
+          select: "bonus price tax status priceTaxedBonus datePaid",
+        })
         .sort({
           createdAt: "desc",
         });
@@ -264,7 +267,7 @@ const productController = {
       const product = await Product.find({
         _id: { $ne: id },
         category,
-        active: true,
+        // active: true,
       }).populate({ path: "user", select: "username" });
       return res.status(200).json({ succes: true, data: product });
     } catch (err) {
@@ -280,7 +283,8 @@ const productController = {
     try {
       product = await Product.findById(id);
 
-      if (!product) return res.status(404).json({ error: "Nenhum produto encontrado" });
+      if (!product)
+        return res.status(404).json({ error: "Nenhum produto encontrado" });
 
       let imgs = [];
       imgs = product.image.productImages.filter((res) => res !== name);
@@ -309,7 +313,8 @@ const productController = {
     try {
       product = await Product.findById(id);
 
-      if (!product) return res.status(404).json({ error: "Nenhum produto encontrado" });
+      if (!product)
+        return res.status(404).json({ error: "Nenhum produto encontrado" });
 
       let imgs, img, name, ext;
 
@@ -393,7 +398,7 @@ const productController = {
       query = { ...query, price: { $gte: minPrice, $lte: maxPrice } };
     }
 
-    query = { ...query, active: true };
+    // query = { ...query, active: true };
 
     if (sortDate) {
       switch (sortDate) {
@@ -440,9 +445,7 @@ const productController = {
     let product;
 
     try {
-      product = await Product.find({ active: true })
-        .limit(4)
-        .sort({ createdAt: -1 });
+      product = await Product.find().limit(4).sort({ createdAt: -1 });
       return res.status(200).json({ data: product });
     } catch (err) {
       console.log(err);
@@ -478,7 +481,6 @@ const productController = {
   },
 
   async productStatus(req, res, next) {
-
     const { active } = req.body;
     const { productId } = req.params;
     let product;
@@ -501,8 +503,7 @@ const productController = {
     let product;
 
     try {
-      product = await Product.find({ active: true })
-        .sort({ createdAt: -1 });
+      product = await Product.find({ active: true }).sort({ createdAt: -1 });
       return res.status(200).json({ data: product });
     } catch (err) {
       console.log(err);
