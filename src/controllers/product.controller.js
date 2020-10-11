@@ -445,7 +445,7 @@ const productController = {
     let product;
 
     try {
-      product = await Product.find().limit(4).sort({ createdAt: -1 });
+      product = await Product.find().limit(16).sort({ createdAt: -1 });
       return res.status(200).json({ data: product });
     } catch (err) {
       console.log(err);
